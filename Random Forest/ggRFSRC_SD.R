@@ -11,7 +11,7 @@ library(caret)
 rfsrc_in_loop <- function(sampledata){
 
 #Data cleaning (read .dat file and remove index column)
-  data1 <-read.delim(paste0("/Users/subinieee/Desktop/ggRFSRC plot/N50_P10-50_TV10_R2/Data/SD",sampledata,".dat"), skip=3, sep=(" "),nrows=50, header = FALSE, stringsAsFactors = FALSE)
+  data1 <-read.delim(paste0("/Users/subinieee/Desktop/ggRFSRC plot/N100_P20-100_TV18_R1/Data/SD",sampledata,".dat"), skip=3, sep=(" "),nrows=100, header = FALSE, stringsAsFactors = FALSE)
   set.seed(100)
   data2 <- data1[,-1]
 
@@ -49,7 +49,7 @@ rfsrc_in_loop <- function(sampledata){
     theme(legend.position=c(0.2,0.2)) +
     coord_cartesian(y=c(0,1.01))
 
-  ggsave("surv_obstime.png", plot=last_plot(),path="/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/")
+  ggsave("surv_obstime.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
 
 #cumulative hazard vs obs time
   plot(gg_dta, type = "cum_haz") +
@@ -59,7 +59,7 @@ rfsrc_in_loop <- function(sampledata){
     theme(legend.position = c(0.2, 0.8)) + 
     coord_cartesian(ylim = c(-0.02, 1.22))
 
-  ggsave("cum_hazard.png", plot=last_plot(),path="/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/")
+  ggsave("cum_hazard.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/"))
   
 #Trial set train (default nodesize is 15 for survival family - the paper used 3)
   rfsrc_trial <- rfsrc(Surv(time,event) ~ .,
@@ -152,6 +152,6 @@ rfsrc_in_loop <- function(sampledata){
   }
 
 # Run rfsrc for different datasets on the loop 
-nr_p<-c(10,20,30,40,50) 
+nr_p<-c(20,30,40,50,100) 
 for (i in c(1:5)){rfsrc_in_loop(nr_p[i])}
 
