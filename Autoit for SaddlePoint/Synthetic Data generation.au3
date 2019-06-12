@@ -20,11 +20,12 @@ If $iAnswer = 7 Then
  EndIf
 
 ; * change array of numbers according to the names of your datafiles.
- Local $arr[5] = [10,20,30,40,50]
+
+Local $arr[5] = [120,140,160,180,200]
 
 for $i = 0 to 4
 
-;creat a new folder for each run.
+;create a new folder for each run.
 DirCreate("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\sd"&$arr[$i])
 
  ; Run Saddlepoint
@@ -59,7 +60,7 @@ Send("1{enter}")
 Sleep(100)
 
 ; *nr of samples (N):
-Send("100{enter}")
+Send("200{enter}")
 Sleep(100)
 
 ; nr of covariates(P)
@@ -67,7 +68,7 @@ Send($arr[$i]&"{enter}")
 Sleep(100)
 
 ;*nr of active risks (excluding EOT):1
-Send("2{enter}")
+Send("1{enter}")
 Sleep(100)
 
 ; nr of latent classes (L): 1
@@ -87,16 +88,16 @@ Send("n{enter}")
 Sleep(100)
 
 ; *nr of truly associated covariates:
-Send("10{enter}")
+Send("18{enter}")
 Sleep(100)
 
 ; *assign beta risks
-Send("0.1{enter}0.2{enter}0.3{enter}0.4{enter}0.5{enter}-0.1{enter}-0.2{enter}-0.3{enter}-0.4{enter}-0.5{enter}")
+Send("0.1{enter}0.2{enter}0.3{enter}0.4{enter}0.5{enter}0.6{enter}0.7{enter}0.8{enter}0.9{enter}-0.1{enter}-0.2{enter}-0.3{enter}-0.4{enter}-0.5{enter}-0.6{enter}-0.7{enter}-0.8{enter}-0.9{enter}")
 Sleep(100)
 
 ; *assign beta risks
-Send("0.01{enter}0.02{enter}0.03{enter}0.04{enter}0.05{enter}-0.01{enter}-0.02{enter}-0.03{enter}-0.04{enter}-0.05{enter}")
-Sleep(100)
+;Send("0.01{enter}0.02{enter}0.03{enter}0.04{enter}0.05{enter}-0.01{enter}-0.02{enter}-0.03{enter}-0.04{enter}-0.05{enter}")
+;Sleep(100)
 
 
 ;baserate shape, risk 1: 1: lambda(t)=C
@@ -108,12 +109,12 @@ Send("4{enter}")
 Sleep(100)
 
 ;* baserate shape, risk 1: 1: lambda(t)=C
-Send("1{enter}")
-Sleep(100)
+;Send("1{enter}")
+;Sleep(100)
 
 ;* average_time(risk 2):100
-Send("5{enter}")
-Sleep(100)
+;Send("5{enter}")
+;Sleep(100)
 
 ;filename:
 Send("SD"&$arr[$i]&"{enter}")
@@ -121,7 +122,7 @@ Sleep(100)
 
 ;~  generate correlograms?  (y/n)
 Send("y{enter}")
-Sleep(500)
+Sleep(100)
 
 
 FileCopy("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\SaddlePoint-Signature.ini", "C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\sd"&$arr[$i]&"\")
@@ -129,15 +130,45 @@ FileCopy("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\SaddlePoint-Sign
 
 DirMove("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\analysis_results", "C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\analysis_results"&$arr[$i]&"\")
 DirMove("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\analysis_results"&$arr[$i]&"\","C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\sd"&$arr[$i]&"\")
+Sleep(100)
 
-;Sleep(500)
 
+Send("0{enter}")
+Sleep(100)
+
+Send("0{enter}")
+
+WinWaitClose($APP_EXE)
+Sleep(5000)
+
+Next
+
+for $i = 0 to 4
+
+ ; Run Saddlepoint
+Run($APP_EXE)
+
+; Wait for the saddlepoint to become active. T
+WinWait("Run", "", 1)
+Sleep(100)
+
+;output directory: analysis_results change?  (y/n) y
+Send("y{enter}")
+Sleep(100)
+
+;new output directory:
+Send("sd"&$arr[$i]&"{enter}")
+Sleep(100)
+
+;output directory: (newone) change?
+Send("n{enter}")
+Sleep(100)
 
 ;MainMenu -1:data input and generation
 Send("1{enter}")
 Sleep(100)
 
-;Data input and generation
+;1.read new data file
 Send("1{enter}")
 Sleep(100)
 
@@ -151,7 +182,7 @@ Sleep(100)
 
 ;save as Mosaic file?
 Send("n{enter}")
-Sleep(100)
+Sleep(500)
 
 ;generate new file with auxiliary NA-covariates?
 Send("n{enter}")
@@ -200,10 +231,11 @@ _WaitAndCloseWindow ("gnuplot graph", "" )
 
 Sleep(100)
 
+FileMove("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\SD"&$arr[$i]&"_normalization_parameters.txt","C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\sd"&$arr[$i]&"\")
+FileMove("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\SD"&$arr[$i]&"_data_stats.txt","C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\sd"&$arr[$i]&"\")
 FileMove("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\SD"&$arr[$i]&".dat","C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\sd"&$arr[$i]&"\")
 FileMove("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\SD"&$arr[$i]&".names","C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\sd"&$arr[$i]&"\")
 Sleep(100)
-
 
 Send("0{enter}")
 Sleep(100)
@@ -214,6 +246,7 @@ Sleep(100)
 WinWaitClose("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\SaddlePoint-Signature.exe")
 
 next
+
 ; HELPER FUNCTIONS
 Func _WaitAndCloseWindow ( $_Title, $_Text='' )
     WinWait  ( $_Title, $_Text )
