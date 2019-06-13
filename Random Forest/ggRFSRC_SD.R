@@ -7,9 +7,10 @@ library(caret)
 
 #Function for repeating RF with different datasets on a loop.
 #make sure the filepath and nrow for data1 are adjusted according to the datafile
-
+Err_Trial <-c(1:5)
+Err_Test <-c(1:5)
+a<-1
 rfsrc_in_loop <- function(sampledata){
-
 #Data cleaning (read .dat file and remove index column)
   data1 <-read.delim(paste0("/Users/subinieee/Desktop/ggRFSRC plot/N100_P20-100_TV18_R1/Data/SD",sampledata,".dat"), skip=3, sep=(" "),nrows=100, header = FALSE, stringsAsFactors = FALSE)
   set.seed(100)
@@ -70,11 +71,11 @@ rfsrc_in_loop <- function(sampledata){
                        na.action="na.impute", 
                        tree.err=TRUE, 
                        importance=TRUE)
-
+  
   capture.output(summary(rfsrc_trial),file=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/summary_trial.txt"))
   print(rfsrc_trial)
   capture.output(print(rfsrc_trial),file=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/print_trial.txt"))
-
+ 
 #Generalisation error
   gg_error1<-gg_error(rfsrc_trial)
   plot(na.omit(gg_error1))  
@@ -149,9 +150,16 @@ rfsrc_in_loop <- function(sampledata){
     coord_cartesian(xlim=c(0,5))
 
   ggsave("variable_dependence.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
+  Err_Trial[a]<<- rfsrc_trial[["err.rate"]][1000]
+  Err_Test[a]<<- rfsrc_test[["err.rate"]][1000]
+  a <<- a+1
   }
 
 # Run rfsrc for different datasets on the loop 
 nr_p<-c(20,30,40,50,100) 
-for (i in c(1:5)){rfsrc_in_loop(nr_p[i])}
+for (i in c(1:5)){rfsrc_in_loop(sampledata = nr_p[i])}
+df <-data.frame(p_n=nr_p/100, test=Err_Test, trial=Err_Trial, stringsAsFactors=FALSE)
+df<-round(cor(df),2)
+head(df)
+
 
