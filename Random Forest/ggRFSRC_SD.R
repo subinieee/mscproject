@@ -11,8 +11,13 @@ Err_Trial <-c(1:5)
 Err_Test <-c(1:5)
 a<-1
 rfsrc_in_loop <- function(sampledata){
-#Data cleaning (read .dat file and remove index column)
-  data1 <-read.delim(paste0("/Users/subinieee/Desktop/ggRFSRC plot/N100_P20-100_TV18_R1/Data/SD",sampledata,".dat"), skip=3, sep=(" "),nrows=100, header = FALSE, stringsAsFactors = FALSE)
+# Data cleaning (read .dat file and remove index column)
+  data1 <-read.delim(paste0("/Users/subinieee/Desktop/ggRFSRC plot/N100_P20-100_TV18_R1/Data/SD",sampledata,".dat"), 
+                     skip=3, 
+                     sep=(" "),
+                     nrows=100, 
+                     header = FALSE, 
+                     stringsAsFactors = FALSE)
   set.seed(100)
   data2 <- data1[,-1]
 
@@ -65,12 +70,13 @@ rfsrc_in_loop <- function(sampledata){
 #Trial set train (default nodesize is 15 for survival family - the paper used 3)
   rfsrc_trial <- rfsrc(Surv(time,event) ~ .,
                        ntree = 1000,
-                       nodesize = 3,
+                       nodesize = 15,
                        data=trial,
                        nsplit=10, 
                        na.action="na.impute", 
                        tree.err=TRUE, 
                        importance=TRUE)
+
   
   capture.output(summary(rfsrc_trial),file=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/summary_trial.txt"))
   print(rfsrc_trial)
@@ -98,7 +104,7 @@ rfsrc_in_loop <- function(sampledata){
 
 #test set predictions
 
-  rfsrc_test <- predict(rfsrc_trial,
+  rfsrc_test <- predict(rfsrc_trial, 
                             newdata = test,
                             na.action = "na.impute",
                             importance = TRUE)
@@ -128,8 +134,7 @@ rfsrc_in_loop <- function(sampledata){
 
 # minimal depth - nodesize different, threshold different
 
-  varsel_trial <- var.select(rfsrc_trial)
-  varsel_trial
+  varsel_trial <- var.select(rfsrc_trial)#refit=TRUE, method="vh")
   gg_md <- gg_minimal_depth(varsel_trial)
 
   capture.output(print(gg_md), file=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/top_variables.txt"))
@@ -157,9 +162,8 @@ rfsrc_in_loop <- function(sampledata){
 
 # Run rfsrc for different datasets on the loop 
 nr_p<-c(20,30,40,50,100) 
-for (i in c(1:5)){rfsrc_in_loop(sampledata = nr_p[i])}
+for (i in c(1:5)){rfsrc_in_loop(nr_p[i])}
+
 df <-data.frame(p_n=nr_p/100, test=Err_Test, trial=Err_Trial, stringsAsFactors=FALSE)
-df<-round(cor(df),2)
-head(df)
-
-
+df<-rbind(read.xlsx("/Users/subinieee/Desktop/ggRFSRC plot/rf.xlsx"), df)
+write.xlsx(df,"/Users/subinieee/Desktop/ggRFSRC plot/rf.xlsx")
