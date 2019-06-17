@@ -36,12 +36,25 @@ rfsrc_pbc_test <- predict(rfsrc_pbc, newdata = pbc.test,
                           importance = TRUE)
 
 #
+# Plot predicted survival for all patients
+#
+plot(gg_rfsrc(rfsrc_pbc_test), alpha=.2) +
+  theme(legend.position = "none") +
+  labs(y = "Survival Probability", x = "Time (years)") +
+  coord_cartesian(ylim = c(-0.01, 1.01))
+
+
+#
 # Choose a cut-off time
 #
 # Look at the vector of times which rfsrc produced predictions for
 # Maybe choose the middle time
-middle <- round(length(rfsrc_pbc_test$time.interest)/2)
-t <- rfsrc_pbc_test$time.interest[middle]
+m <- round(length(rfsrc_pbc_test$time.interest)/2)
+# Or closest to some chosen time
+t <- 6
+m <- which.min(abs(rfsrc_pbc_test$time.interest - t))
+
+t <- rfsrc_pbc_test$time.interest[m]
 
 #
 # Get the ground truth as a vector of who did survive beyond t
@@ -51,7 +64,7 @@ truth <- pbc.test$years > t
 #
 # Get the prediction of who rf thinks will survive > t
 #
-pred <- rfsrc_pbc_test$survival[,middle] > 0.5
+pred <- rfsrc_pbc_test$survival[,m] > 0.5
 
 #
 # Confusion matrix
