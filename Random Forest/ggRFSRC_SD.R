@@ -13,12 +13,16 @@ Err_Trial <-c(1:3)
 Err_Test <-c(1:3)
 a<-1
 TV <-18
-N <-200
-P<-c(120,140,160) 
+N <-53
+P<-c(120,140,160)
+
+st.cols<- read.delim("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Daiichi_All_PFS.names", sep=(" "), header = FALSE, stringsAsFactors = FALSE)[,2]
+
+
 datasrc <-"/Users/subinieee/Desktop/ggRFSRC plot/N200_P120-200_TV18_R1/Data/SD"
 rfsrc_in_loop <- function(sampledata){
 # Data cleaning (read .dat file and remove index column)
-  data1 <-read.delim(paste0(datasrc,sampledata,".dat"), 
+  data1 <-read.delim("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Daiichi_All_PFS.dat", 
                      skip=3, 
                      sep=(" "),
                      nrows=N, 
@@ -28,12 +32,13 @@ rfsrc_in_loop <- function(sampledata){
   data2 <- data1[,-1]
 
 #column names
-  col_names <-list(1:ncol(data2))
-  col_names <-paste0("","A",col_names[[1]],"")
-  colnames(data2) <-col_names
-  colnames(data2)[colnames(data2)==colnames(data2[ncol(data2)-1])] <- "time"
-  colnames(data2)[colnames(data2)==colnames(data2[ncol(data2)])] <- "event"
-  data2$event[data2$event=="2"] <-"0"
+  colnames(data2) <-st.cols
+  #col_names <-list(1:ncol(data2))
+  #col_names <-paste0("","A",col_names[[1]],"")
+  
+  colnames(data2)[length(colnames(data2))-1] <- "time"
+  colnames(data2)[length(colnames(data2))] <- "event"
+  
   data2$event <-as.numeric(data2$event)
 
 # Create the gg_survival object
@@ -43,11 +48,11 @@ rfsrc_in_loop <- function(sampledata){
                       conf.int=0.95)
 
 #split data in 50:50 (trial and test)
-  seq_len(nrow(data2))
-  smp_size <-floor(0.5*nrow(data2))
-  train_ind<-sample(seq_len(nrow(data2)), size=smp_size)
-  trial <- data2[train_ind,]
-  test <- data2[-train_ind,]
+# seq_len(nrow(data2))
+#  smp_size <-floor(0.5*nrow(data2))
+#  train_ind<-sample(seq_len(nrow(data2)), size=smp_size)
+#  trial <- data2[train_ind,]
+#  test <- data2[-train_ind,]
 
 #creat a folder to contain the results
   dir.create(path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
@@ -77,7 +82,7 @@ rfsrc_in_loop <- function(sampledata){
   rfsrc_trial <- rfsrc(Surv(time,event) ~ .,
                        ntree = 1000,
                        nodesize = 3,
-                       data=trial,
+                       data=data2,
                        nsplit=10, 
                        na.action="na.impute", 
                        tree.err=TRUE, 
@@ -139,23 +144,20 @@ rfsrc_in_loop <- function(sampledata){
   #t <- 3.827397
   #m <- which.min(abs(rfsrc_pbc_test$time.interest - t))
   
-  t <- median(test$time)
-  t2<- median(trial$time)
+  t<- median(trial$time)
   
-  m <- which.min(abs(rfsrc_test$time.interest - t))
-  m2 <- which.min(abs(rfsrc_trial$time.interest - t2))
+  m <- which.min(abs(rfsrc_trial$time.interest - t))
   
-  t <- rfsrc_test$time.interest[m]
-  t2<- rfsrc_trial$time.interest[m2]  
+  t<- rfsrc_trial$time.interest[m]  
   #
   # Get the ground truth as a vector of who did survive beyond t
-  truth <- test$time > t
-  truth2 <-trial$time >t2
+  truth <- trial$time > t
+  truth2 <- trial$time > t
   
   #
   # Get the prediction of who rf thinks will survive > t
-  pred <- rfsrc_test$survival[,m] > 0.5
-  pred2 <- rfsrc_trial$survival.oob[,m2] >0.5
+  pred <- rfsrc_trial$survival[,m] > 0.5
+  pred2 <- rfsrc_trial$survival.oob[,m] >0.5
   # Confusion matrix
   cm <- table(truth, pred)
   cm2 <-table(truth2, pred2)  
@@ -179,9 +181,9 @@ rfsrc_in_loop <- function(sampledata){
   accuracy2 <-(cm2[1,1] + cm2[2,2])/sum(cm2)
 # variable importance(lbls=st.labs needs to be defined)
 
-  plot(gg_vimp(rfsrc_trial))+
+  plot(gg_vimp(rfsrc_trial), lbls=st.cols)+
     theme(legend.position=c(p=0.8,0.2))+
-    labs(fill="VIMP > 0")
+   labs(fill="VIMP > 0")
 
   ggsave("vimp.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
 
@@ -197,7 +199,7 @@ rfsrc_in_loop <- function(sampledata){
 
 #variable selection comparison
 
-  plot(gg_minimal_vimp(gg_md))+
+  plot(gg_minimal_vimp(gg_md),lbls=st.cols)+
     theme(legend.position = c(0.8,0.2))
   ggsave("var_comparison.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
 
