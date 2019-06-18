@@ -94,28 +94,6 @@ st.cols<- read.delim("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Daiichi_A
 
     ggsave("rfsrc_train.png", plot=last_plot(),path="C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF")
 
-#test set predictions
-
-  rfsrc_test <- predict(rfsrc_train, 
-                            newdata = test,
-                            na.action = "na.impute",
-                            importance = TRUE)
-  
-  summary_test <- summary(rfsrc_test)
-  capture.output(summary(rfsrc_test),file=paste0("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/summary_test.txt"))
-
-  print_test<-print(rfsrc_test)
-  capture.output(print(rfsrc_test),file=paste0("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/print_test.txt"))
-
-  plot(gg_rfsrc(rfsrc_test),alpha=0.2)+
-#  scale_color_manual(values = strCol)+
-    theme(legend.position="none")+
-    labs(y="Survival Probability",
-         x="Time(years)")+
-    coord_cartesian(ylim=c(-0.01,1.01))
-
-  ggsave("rfsrc_test.png", plot=last_plot(),path="C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/")
-  
   # Choose a cut-off time
   #
   # Look at the vector of times which rfsrc produced predictions for
@@ -125,41 +103,41 @@ st.cols<- read.delim("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Daiichi_A
   #t <- 3.827397
   #m <- which.min(abs(rfsrc_pbc_test$time.interest - t))
   
-  t<- median(train$time)
+  t<- median(data2$time)
   
   m <- which.min(abs(rfsrc_train$time.interest - t))
   
   t<- rfsrc_train$time.interest[m]  
 
 # Get the ground truth as a vector of who did survive beyond t
-  truth <- train$time > t
+  truth <- data2$time > t
   
 
 # Get the prediction of who rf thinks will survive > t
   pred_test <- rfsrc_train$survival[,m] > 0.5
   pred_train <- rfsrc_train$survival.oob[,m] >0.5
 # Confusion matrix
-  cm_train <- matrix(c(length(which(truth2=="FALSE" & pred2=="FALSE")),length(which(truth2=="FALSE" & pred2=="TRUE")),
-                  length(which(truth2=="TRUE" & pred2=="FALSE")),length(which(truth2=="TRUE" & pred2=="TRUE"))),
+  cm_train <- matrix(c(length(which(truth=="FALSE" & pred_train=="FALSE")),length(which(truth=="FALSE" & pred_train=="TRUE")),
+                  length(which(truth=="TRUE" & pred_train=="FALSE")),length(which(truth=="TRUE" & pred_train=="TRUE"))),
                 ncol=2,byrow=TRUE)
   colnames(cm_train) <- c("FALSE","TRUE")
   rownames(cm_train) <- c("FALSE","TRUE")
   cm_train <- as.table(cm_train)
   
-  cm_test <- matrix(c(length(which(truth=="FALSE" & pred=="FALSE")),length(which(truth=="FALSE" & pred=="TRUE")),
-                 length(which(truth=="TRUE" & pred=="FALSE")),length(which(truth=="TRUE" & pred=="TRUE"))),
+  cm_test <- matrix(c(length(which(truth=="FALSE" & pred_test=="FALSE")),length(which(truth=="FALSE" & pred_test=="TRUE")),
+                 length(which(truth=="TRUE" & pred_test=="FALSE")),length(which(truth=="TRUE" & pred_test=="TRUE"))),
                ncol=2,byrow=TRUE)
   colnames(cm_test) <- c("FALSE","TRUE")
   rownames(cm_test) <- c("FALSE","TRUE")
   cm_test <- as.table(cm_test)
   
 # Accuracy
-    accuracy_train <-(cm_train[1,1] + cm_train[2,2])/sum(cm_train)
+  accuracy_train <-(cm_train[1,1] + cm_train[2,2])/sum(cm_train)
   accuracy_test <- (cm_test[1,1] + cm_test[2,2])/sum(cm_test)
   
 # variable importance(lbls=st.labs needs to be defined)
 
-  plot(gg_vimp(rfsrc_train), lbls=st.cols)+
+  plot(gg_vimp(nvar = 50, rfsrc_train), lbls=st.cols)+
     theme(legend.position=c(p=0.8,0.2))+
    labs(fill="VIMP > 0")
 
@@ -173,7 +151,7 @@ st.cols<- read.delim("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Daiichi_A
   capture.output(print(gg_md), file="C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/top_variables.txt")
 
   plot(gg_md)
-  ggsave("top_variables.png", plot=last_plot(),path=path="C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/")
+  ggsave("top_variables.png", plot=last_plot(),path="C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/")
 
 #variable selection comparison
 
@@ -188,16 +166,14 @@ st.cols<- read.delim("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Daiichi_A
     coord_cartesian(xlim=c(0,5))
 
   ggsave("variable_dependence.png", plot=last_plot(),path="C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/")
-  Err_train[a]<- accuracy_train
-  Err_Test[a]<- accuracy_test
+
 
 #Create workbook
   
 wb<-createWorkbook()
 addWorksheet(wb, "Train")
-writeData(wb,sheet="Train",cm)
+writeData(wb,sheet="Train",cm_train)
 addWorksheet(wb, "Test")
-writeData(wb,sheet="Test",cm2)
+writeData(wb,sheet="Test",cm_test)
 saveWorkbook(wb, "C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/confusion_matrix.xlsx", overwrite = TRUE)
-saveWorkbook(wb, "C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Test/Daiichi/RF/confusion_matrix.txt", overwrite = TRUE)
 
