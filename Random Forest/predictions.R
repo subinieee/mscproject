@@ -24,9 +24,13 @@ pbc.test <- pbc[is.na(pbc$treatment),]
 #
 # Train RF on the train set
 #
-rfsrc_pbc <- rfsrc(Surv(years, status) ~ ., data = pbc.trial,
-                   nsplit = 10, na.action = "na.impute",
-                   tree.err = TRUE,importance = TRUE)
+rfsrc_pbc <- rfsrc(Surv(years, status) ~ ., 
+                   data = pbc.trial,
+                   nsplit = 10, 
+                   nodesize = 3,
+                   na.action = "na.impute",
+                   tree.err = TRUE,
+                   importance = TRUE)
 
 #
 # Get predictions on the test set
@@ -51,7 +55,10 @@ plot(gg_rfsrc(rfsrc_pbc_test), alpha=.2) +
 # Maybe choose the middle time
 m <- round(length(rfsrc_pbc_test$time.interest)/2)
 # Or closest to some chosen time
-t <- 6
+#t <- 3.827397
+#m <- which.min(abs(rfsrc_pbc_test$time.interest - t))
+
+t <- median(pbc.test)
 m <- which.min(abs(rfsrc_pbc_test$time.interest - t))
 
 t <- rfsrc_pbc_test$time.interest[m]
