@@ -52,8 +52,8 @@ for $i = 0 to 2
 	  Sleep(100)
 
 	  ; *nr of samples (N):
-	  Send($arr[$i])
-	  Sleep(200)
+	  Send($arr[$i]&"{enter}")
+	  Sleep(100)
 
 	  ; nr of covariates(P)
 	  Send($arr2[$j]&"{enter}")
@@ -89,7 +89,7 @@ for $i = 0 to 2
 
 	  ;upper censoring time:
 	  Send("12{enter}")
-	  Sleep(300)
+	  Sleep(100)
 
 	  ; *nr of truly associated covariates:
 	  Send("10{enter}")
@@ -113,13 +113,21 @@ for $i = 0 to 2
 	  Sleep(100)
 
 	  ;~  generate correlograms?  (y/n)
-	  Send("n{enter}")
+	  Send("y{enter}")
 
 	  Sleep(500)
 
 	  DirMove("C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\analysis_results", "C:\Users\Public\bin\SaddlePoint-Signature-v2.8.7\Test\analysis_results"&"N"&$arr[$i]&"_P"&$arr2[$j])
 
 	  Sleep(500)
+	  Local $iAnswer = MsgBox(BitOR($MB_YESNO, $MB_SYSTEMMODAL), "Auto", "This script will run create Synthetic Time-to-event data on Saddlepoint. Do you want to run it?")
+	  ; Check the user's answer to the prompt (see the help file for MsgBox return values)
+	  ; If "No" was clicked (7) then exit the script
+	  If $iAnswer = 7 Then
+		 MsgBox($MB_SYSTEMMODAL, "AutoIt", "OK.  Bye!")
+		 Exit
+
+		 EndIf
 
    Next
 
