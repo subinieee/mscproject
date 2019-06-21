@@ -85,7 +85,15 @@ rfsrc_in_loop <- function(sampledata){
   capture.output(summary(rfsrc_train),file=paste0("",savepath,"/summary_train.txt",""))
   print(rfsrc_train)
   capture.output(print(rfsrc_train),file=paste0("",savepath,"/print_train.txt",""))
- 
+#test set predictions  
+  rfsrc_test <- predict(rfsrc_test, 
+                        newdata = test,
+                        na.action = "na.impute",
+                        importance = TRUE)
+  
+  capture.output(summary(rfsrc_test),file=paste0("",savepath,"/summary_test.txt",""))
+  print(rfsrc_test)
+  capture.output(print(rfsrc_test),file=paste0("",savepath,"/print_test.txt",""))
 #Generalisation error
   gg_error1<-gg_error(rfsrc_train)
   plot(na.omit(gg_error1))  

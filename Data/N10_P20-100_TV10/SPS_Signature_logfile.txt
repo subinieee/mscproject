@@ -1,3 +1,0 @@
-Fri Jun 21 12:09:52 2019
-reading SD_test100.dat
-normalizing data ...
