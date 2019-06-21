@@ -7,27 +7,29 @@ library(caret)
 library(readr)
 library(openxlsx)
 
-#Function for repeating RF with different datasets on a loop.
-#make sure the filepath and nrow for data1 are adjusted according to the datafile
 Err_train <-c(1:3)
 Err_Test <-c(1:3)
+Avg_Err_train<-c(1:5)
+Avg_Err_Test<-c(1:5)
 a<-1
-TV <-18
-N <-53
-P<-c(120,140,160)
+b<-1
+TV <-10
+N <-50
+P<-c(10,20,30,40,50)
+datasrc <-"~/GitHub/mscproject/Data/EOTy_N100_P10-50_TV10_R1"
 
-#st.cols<- read.delim("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Daiichi_All_PFS.names", sep=(" "), header = FALSE, stringsAsFactors = FALSE)[,2]
-
-datasrc <-"/Users/subinieee/Desktop/ggRFSRC plot/N200_P120-200_TV18_R1/Data/SD"
+#Function for repeating RF with different datasets on a loop.
 rfsrc_in_loop <- function(sampledata){
+  savepath<<-paste0("",datasrc,"/sd",sampledata,"")
+  for (j in c(1:3)){
 # Data cleaning (read .dat file and remove index column)
-  data1 <-read.delim("C:/Users/Public/bin/SaddlePoint-Signature-v2.8.7/Daiichi_All_PFS.dat", 
+  data1 <-read.delim(paste0(savepath,"/SD",sampledata,".dat"), 
                      skip=3, 
                      sep=(" "),
                      nrows=N, 
                      header = FALSE, 
                      stringsAsFactors = FALSE)
-  set.seed(100)
+  set.seed(j)
   data2 <- data1[,-1]
 
 #column names
@@ -44,15 +46,8 @@ rfsrc_in_loop <- function(sampledata){
                       data=data2,
                       conf.int=0.95)
 
-#split data in 50:50 (train and test)
-# seq_len(nrow(data2))
-#  smp_size <-floor(0.5*nrow(data2))
-#  train_ind<-sample(seq_len(nrow(data2)), size=smp_size)
-#  train <- data2[train_ind,]
-#  test <- data2[-train_ind,]
-
-#creat a folder to contain the results
-  dir.create(path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
+#create a folder to contain the results
+  dir.create(path=paste0("",datasrc,sampledata,"/RSF",sampledata,""))
 
 # Survival probability vs observation time
   plot(gg_dta) +
@@ -63,7 +58,7 @@ rfsrc_in_loop <- function(sampledata){
     theme(legend.position=c(0.2,0.2)) +
     coord_cartesian(y=c(0,1.01))
 
-  ggsave("surv_obstime.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
+  ggsave("surv_obstime.png", plot=last_plot(),path=savepath)
 
 #cumulative hazard vs obs time
   plot(gg_dta, type = "cum_haz") +
@@ -73,7 +68,7 @@ rfsrc_in_loop <- function(sampledata){
     theme(legend.position = c(0.2, 0.8)) + 
     coord_cartesian(ylim = c(-0.02, 1.22))
 
-  ggsave("cum_hazard.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/"))
+  ggsave("cum_hazard.png", plot=last_plot(),path=savepath)
   
 #train set train (default nodesize is 15 for survival family - the paper used 3)
   rfsrc_train <- rfsrc(Surv(time,event) ~ .,
@@ -81,20 +76,21 @@ rfsrc_in_loop <- function(sampledata){
                        nodesize = 3,
                        data=data2,
                        nsplit=10, 
-                       na.action="na.impute", 
+                       na.action="na.impute",
+                       sampsize=25,
                        tree.err=TRUE, 
                        importance=TRUE)
 
   
-  capture.output(summary(rfsrc_train),file=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/summary_train.txt"))
+  capture.output(summary(rfsrc_train),file=paste0("",savepath,"/summary_train.txt",""))
   print(rfsrc_train)
-  capture.output(print(rfsrc_train),file=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/print_train.txt"))
+  capture.output(print(rfsrc_train),file=paste0("",savepath,"/print_train.txt",""))
  
 #Generalisation error
   gg_error1<-gg_error(rfsrc_train)
   plot(na.omit(gg_error1))  
 
-  ggsave("OOB_err.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
+  ggsave("OOB_err.png", plot=last_plot(),path=savepath)
        
 #strCols should be defined "TRUE" for death(event), "FALSE" for censored
 #strCol <- c("TRUE" = "red",
@@ -108,30 +104,40 @@ rfsrc_in_loop <- function(sampledata){
     coord_cartesian(ylim=c(-0.01,1.01))
   show(ggRFsrc)
 
-    ggsave("rfsrc_train.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
+    ggsave("rfsrc_train.png", plot=last_plot(),path=savepath)
 
+# variable importance(lbls=st.labs needs to be defined)
+
+  plot(gg_vimp(nvar = P[i], rfsrc_train))+
+    theme(legend.position=c(p=0.8,0.2))+
+   labs(fill="VIMP > 0")
+
+  ggsave(paste0("vimp(",j,").png"), plot=last_plot(),path=savepath)
+
+# minimal depth - nodesize different, threshold different
+
+  varsel_train <- var.select(rfsrc_train)
+  gg_md <- gg_minimal_depth(varsel_train)
+
+  capture.output(print(gg_md), file=paste0(savepath,"/top_variables(",j,").txt",""))
+
+  plot(gg_md)
+  ggsave(paste0("top_variables(",j,").png"), plot=last_plot(),path=savepath)
 #test set predictions
 
   
-  # Choose a cut-off time
-  #
-  # Look at the vector of times which rfsrc produced predictions for
-  # Maybe choose the middle time
-  # m <- round(length(rfsrc_test$time.interest)/2)
-  # Or closest to some chosen time
-  #t <- 3.827397
-  #m <- which.min(abs(rfsrc_pbc_test$time.interest - t))
-  
-  t<- median(train$time)
+#Prediction Accuracy 
+  #find cut-off time(median survival time)
+  t<- median(data2$time)
   m <- which.min(abs(rfsrc_train$time.interest - t))
   t<- rfsrc_train$time.interest[m]  
   #
   # Get the ground truth as a vector of who did survive beyond t
-  truth <- train$time > t
+  truth <- data2$time > t
    #
   # Get the prediction of who rf thinks will survive > t
-  pred_train <- gg_md$rfsrc.refit.obj$survival[,m] >0.5 #rfsrc_train$survival[,m] > 0.5
-  pred_test <- gg_md$rfsrc.refit.obj$survival.oob[,m] >0.5 #rfsrc_train$survival.oob[,m] >0.5
+  pred_train <- rfsrc_train$survival[,m] >0.5 #rfsrc_train$survival[,m] > 0.5
+  pred_test <- rfsrc_train$survival.oob[,m] >0.5 #rfsrc_train$survival.oob[,m] >0.5
   # Confusion matrix
   cm_train <- matrix(c(length(which(truth=="FALSE" & pred_train=="FALSE")),length(which(truth=="FALSE" & pred_train=="TRUE")),
                  length(which(truth=="TRUE" & pred_train=="FALSE")),length(which(truth=="TRUE" & pred_train=="TRUE"))),
@@ -140,8 +146,8 @@ rfsrc_in_loop <- function(sampledata){
   rownames(cm_train) <- c("FALSE","TRUE")
   cm_train <- as.table(cm_train)
   
-  cm_test <- matrix(c(length(which(truth_test=="FALSE" & pred_test=="FALSE")),length(which(truth=="FALSE" & pred_test=="TRUE")),
-                  length(which(truth_test=="TRUE" & pred_test=="FALSE")),length(which(truth=="TRUE" & pred_test=="TRUE"))),
+  cm_test <- matrix(c(length(which(truth=="FALSE" & pred_test=="FALSE")),length(which(truth=="FALSE" & pred_test=="TRUE")),
+                  length(which(truth=="TRUE" & pred_test=="FALSE")),length(which(truth=="TRUE" & pred_test=="TRUE"))),
                 ncol=2,byrow=TRUE)
   colnames(cm_test) <- c("FALSE","TRUE")
   rownames(cm_test) <- c("FALSE","TRUE")
@@ -150,54 +156,36 @@ rfsrc_in_loop <- function(sampledata){
   # Accuracy  
   accuracy_train <- (cm_train[1,1] + cm_train[2,2])/sum(cm_train)
   accuracy_test <-(cm_test[1,1] + cm_test[2,2])/sum(cm_test)
-# variable importance(lbls=st.labs needs to be defined)
-
-  plot(gg_vimp(rfsrc_train), lbls=st.cols)+
-    theme(legend.position=c(p=0.8,0.2))+
-   labs(fill="VIMP > 0")
-
-  ggsave("vimp.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
-
-# minimal depth - nodesize different, threshold different
-
-  varsel_train <- var.select(rfsrc_train,refit=TRUE, method="vh")
-  gg_md <- gg_minimal_depth(varsel_train)
-
-  capture.output(print(gg_md), file=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2,"/top_variables.txt"))
-
-  plot(gg_md)
-  ggsave("top_variables.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
-
-#variable selection comparison
-
-  plot(gg_minimal_vimp(gg_md),lbls=st.cols)+
-    theme(legend.position = c(0.8,0.2))
-  ggsave("var_comparison.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
-
-#variable dependence
-
-  ggRFsrc + geom_vline(aes(xintercept=1), 
-                       linetype="dashed")+
-    coord_cartesian(xlim=c(0,5))
-
-  ggsave("variable_dependence.png", plot=last_plot(),path=paste0("/Users/subinieee/Desktop/ggRFSRC plot/SD",ncol(data2)-2))
+  #collect data in an array(replace 'a'th number in the array after each loop)
   Err_train[a]<<- accuracy_train
   Err_Test[a]<<- accuracy_test
   a <<- a+1
+  sampledata<<-sampledata
   }
+  #reset the "a" value to keep it =<3
+  a<<-1
+  #collect average accuary values of the model at different P values
+  Avg_Err_train[b]<<- mean(x = Err_train)
+  Avg_Err_Test[b]<<- mean(x=Err_Test)
+  b<<-b+1
+}
+
 # Run rfsrc for different datasets on the loop 
-for (i in c(1:3)){rfsrc_in_loop(P[i])}
+for (i in c(1:5)){rfsrc_in_loop(P[i])}
 
-df1 <-data.frame(p_n=P/N, test=Err_Test, train=Err_train, stringsAsFactors=FALSE)
-df1<-rbind(read.xlsx("/Users/subinieee/Desktop/ggRFSRC plot/test1.xlsx",sheet="P_N"), df1)
-df2 <-data.frame(TV_P=TV/P, test=Err_Test, train=Err_train, stringsAsFactors=FALSE)
-df2<-rbind(read.xlsx("/Users/subinieee/Desktop/ggRFSRC plot/test1.xlsx",sheet = "TV_P"), df2)
-df3 <-data.frame(TV_N=TV/N, test=Err_Test, train=Err_train, stringsAsFactors=FALSE)
-df3<-rbind(read.xlsx("/Users/subinieee/Desktop/ggRFSRC plot/test1.xlsx", sheet="TV_N"), df3)
+#create dataframes and combine with old data
+excelpath<-paste0("",datasrc,"/RSF_N",N,"_results.xlsx","")
+df1 <-data.frame(p_n=P/N, test=Avg_Err_Test, train=Avg_Err_train, stringsAsFactors=FALSE)
+df1<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
+df2 <-data.frame(TV_P=TV/P, test=Avg_Err_Test, train=Avg_Err_train, stringsAsFactors=FALSE)
+df2<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
+df3 <-data.frame(TV_N=TV/N, test=Avg_Err_Test, train=Avg_Err_train, stringsAsFactors=FALSE)
+df3<-rbind(read.xlsx(excelpath, sheet="TV_N"), df3)
 
-write.xlsx(df1,"/Users/subinieee/Desktop/ggRFSRC plot/test1.xlsx",sheetName="P_N", append=FALSE)
-write.xlsx(df2,"/Users/subinieee/Desktop/ggRFSRC plot/test1.xlsx",sheetName="TV_P",append=TRUE)
-write.xlsx(df2,"/Users/subinieee/Desktop/ggRFSRC plot/test1.xlsx",sheetName="TV_N", append=TRUE)
+#push combined data to a new excel file. 
+write.xlsx(df1,excelpath,sheetName="P_N", append=FALSE)
+write.xlsx(df2,excelpath,sheetName="TV_P",append=TRUE)
+write.xlsx(df2,excelpath,sheetName="TV_N", append=TRUE)
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 writeData(wb,sheet="P_N",df1)
@@ -205,5 +193,5 @@ addWorksheet(wb, "TV_P")
 writeData(wb,sheet="TV_P",df2)
 addWorksheet(wb, "TV_N")
 writeData(wb,sheet="TV_N",df3)
-saveWorkbook(wb, "/Users/subinieee/Desktop/ggRFSRC plot/test1.xlsx", overwrite = TRUE)
+saveWorkbook(wb,excelpath, overwrite = TRUE)
 
