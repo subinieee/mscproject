@@ -1,0 +1,4 @@
+covariate4: beta[4]=0.457158(rank=4)
+covariate19: beta[19]=0.698182(rank=1)
+covariate34: beta[34]=0.757550(rank=2)
+covariate80: beta[80]=-0.623751(rank=3)

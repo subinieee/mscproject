@@ -1,0 +1,6 @@
+covariate1: beta[1]=0.439783(rank=4)
+covariate3: beta[3]=0.912738(rank=1)
+covariate4: beta[4]=0.550790(rank=5)
+covariate6: beta[6]=-0.477177(rank=3)
+covariate7: beta[7]=-0.410670(rank=6)
+covariate10: beta[10]=-0.693328(rank=2)
