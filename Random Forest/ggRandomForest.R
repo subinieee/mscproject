@@ -90,6 +90,11 @@ rfsrc_pbc <- rfsrc(Surv(years,status) ~ .,
                    na.action="na.impute", 
                    tree.err=TRUE, 
                    importance=TRUE)
+
+rfsrc_train_C <- predict(rfsrc_pbc, 
+                          newdata = pbc.trial,
+                          na.action = "na.impute",
+                          importance = TRUE)
 #Generalisation error
 summary(rfsrc_pbc)
 
@@ -260,3 +265,39 @@ var_dep <- plot(ggvar, xvar = "bili",
 var_dep
 var_dep+facet_grid(~edema)
 
+
+#Prediction Accuracy 
+#find cut-off time(median survival time)
+t<- median(pbc.trial$years)
+m <- which.min(abs(rfsrc_train_C$time.interest - t))
+t<- rfsrc_train_C$time.interest[m]  
+
+t2<- median(pbc.test$years)
+m2 <- which.min(abs(rfsrc_pbc_test$time.interest - t2))
+t2<- rfsrc_pbc_test$time.interest[m2]  
+#
+# Get the ground truth as a vector of who did survive beyond t
+truth <- pbc.trial$years > t
+truth2 <- pbc.test$years > t2
+#
+# Get the prediction of who rf thinks will survive > t
+pred_train <- rfsrc_train_C$survival[,m] >0.5 #rfsrc_train$survival[,m] > 0.5
+pred_test <- rfsrc_pbc_test$survival[,m] >0.5 #rfsrc_train$survival.oob[,m] >0.5
+# Confusion matrix
+cm_train <- matrix(c(length(which(truth=="FALSE" & pred_train=="FALSE")),length(which(truth=="FALSE" & pred_train=="TRUE")),
+                     length(which(truth=="TRUE" & pred_train=="FALSE")),length(which(truth=="TRUE" & pred_train=="TRUE"))),
+                   ncol=2,byrow=TRUE)
+colnames(cm_train) <- c("FALSE","TRUE")
+rownames(cm_train) <- c("FALSE","TRUE")
+cm_train <- as.table(cm_train)
+
+cm_test <- matrix(c(length(which(truth2=="FALSE" & pred_test=="FALSE")),length(which(truth2=="FALSE" & pred_test=="TRUE")),
+                    length(which(truth2=="TRUE" & pred_test=="FALSE")),length(which(truth2=="TRUE" & pred_test=="TRUE"))),
+                  ncol=2,byrow=TRUE)
+colnames(cm_test) <- c("FALSE","TRUE")
+rownames(cm_test) <- c("FALSE","TRUE")
+cm_test <- as.table(cm_test)
+
+# Accuracy  
+accuracy_train <- (cm_train[1,1] + cm_train[2,2])/sum(cm_train)
+accuracy_test <-(cm_test[1,1] + cm_test[2,2])/sum(cm_test)

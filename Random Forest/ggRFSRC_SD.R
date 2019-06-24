@@ -9,17 +9,30 @@ library(openxlsx)
 
 Avg_Err_train<-c(1:5)
 Avg_Err_test<-c(1:5)
+Avg_sensitivity<-c(1:5)
+Avg_specificity<-c(1:5)
+
 a<-1
 b<-1
+excelpath<-"~/GitHub/mscproject/Data/RSF_results.xlsx"
+wb<-createWorkbook()
+addWorksheet(wb, "P_N")
+addWorksheet(wb, "TV_P")
+addWorksheet(wb, "TV_N")
+saveWorkbook(wb,excelpath, overwrite = TRUE)
 TV <-10
 N_arr<-c(10,50,100)
 P<-c(20,40,60,80,100)
+
+
 for (k in c(1:3)){N<-N_arr[k]
 datasrc <-paste0("~/GitHub/mscproject/Data/Train data/N",N,"_P20-100_TV10")
 #Function for repeating RF with different datasets on a loop.
 rfsrc_in_loop <- function(p_number){
   Err_train <<-c(1:3)
   Err_test <<-c(1:3)
+  Sensitivity <<-c(1:3)
+  Specificity <<-c(1:3)
   savepath<<-paste0("",datasrc,"/RSF",p_number,"")
   for (j in c(1:3)){
 # Data cleaning (read .dat file and remove index column)
@@ -37,17 +50,20 @@ rfsrc_in_loop <- function(p_number){
                          nrows=100, 
                          header = FALSE, 
                          stringsAsFactors = FALSE)
+  data_test <- data_test[,-1]
 
 #column names
-  #colnames(data_train) <-st.cols
+
   col_names <-list(1:ncol(data_train))
   col_names <-paste0("","A",col_names[[1]],"")
+  colnames(data_train) <-col_names
   colnames(data_train)[length(colnames(data_train))-1] <- "time"
   colnames(data_train)[length(colnames(data_train))] <- "event"
   data_train$event <-as.numeric(data_train$event)
   
   col_names <-list(1:ncol(data_test))
   col_names <-paste0("","A",col_names[[1]],"")
+  colnames(data_test) <-col_names
   colnames(data_test)[length(colnames(data_test))-1] <- "time"
   colnames(data_test)[length(colnames(data_test))] <- "event"
   data_test$event <-as.numeric(data_test$event)
@@ -91,11 +107,15 @@ rfsrc_in_loop <- function(p_number){
                        na.action="na.impute",
                        tree.err=TRUE, 
                        importance=TRUE)
-
   
-  capture.output(summary(rfsrc_train),file=paste0("",savepath,"/summary_train.txt",""))
-  print(rfsrc_train)
-  capture.output(print(rfsrc_train),file=paste0("",savepath,"/print_train.txt",""))
+  rfsrc_train_CV <- predict(rfsrc_train, 
+                        newdata = data_train,
+                        na.action = "na.impute",
+                        importance = TRUE)
+  
+  capture.output(summary(rfsrc_train_CV),file=paste0("",savepath,"/summary_train.txt",""))
+  print(rfsrc_train_CV)
+  capture.output(print(rfsrc_train_CV),file=paste0("",savepath,"/print_train.txt",""))
 #test set predictions  
   rfsrc_test <- predict(rfsrc_train, 
                         newdata = data_test,
@@ -112,12 +132,12 @@ rfsrc_in_loop <- function(p_number){
   ggsave("OOB_err.png", plot=last_plot(),path=savepath)
        
 #strCols should be defined "TRUE" for death(event), "FALSE" for censored
-#strCol <- c("TRUE" = "red",
-#            "FALSE"="blue")
+strCol <- c("TRUE" = "red",
+            "FALSE"="blue")
 
   ggRFsrc <-plot(gg_rfsrc(rfsrc_train),alpha=0.2)+
     theme(legend.position="none")+
-  #scale_color_manual(values = strCol)+
+  scale_color_manual(values = strCol)+
     labs(y="Survival Probability",
          x="Time(years)")+
     coord_cartesian(ylim=c(-0.01,1.01))
@@ -126,11 +146,16 @@ rfsrc_in_loop <- function(p_number){
    ggsave("rfsrc_train.png", plot=last_plot(),path=savepath)
 
 # variable importance(lbls=st.labs needs to be defined)
+  vimp<-gg_vimp(nvar = P[i], rfsrc_train)
+  vimp<-gsub("A", "", vimp$vars)
+  vimp_count<-length(which(as.numeric(vimp[1:TV])<=10))
+  Sensitivity<-length(which(as.numeric(vimp[1:TV])<=10))/TV
+  Specificity<-(P[i]-TV-length(which(as.numeric(vimp[1:TV])>10)))/(P[i]-TV)
 
   plot(gg_vimp(nvar = P[i], rfsrc_train))+
     theme(legend.position=c(p=0.8,0.2))+
    labs(fill="VIMP > 0")
-
+  capture.output(print(vimp), file=paste0(savepath,"/vimp(",j,").txt",""))
   ggsave(paste0("vimp(",j,").png"), plot=last_plot(),path=savepath)
 
 # minimal depth - nodesize different, threshold different
@@ -148,8 +173,8 @@ rfsrc_in_loop <- function(p_number){
 #Prediction Accuracy 
   #find cut-off time(median survival time)
   t<- median(data_train$time)
-  m <- which.min(abs(rfsrc_train$time.interest - t))
-  t<- rfsrc_train$time.interest[m]  
+  m <- which.min(abs(rfsrc_train_CV$time.interest - t))
+  t<- rfsrc_train_CV$time.interest[m]  
   
   t2<- median(data_test$time)
   m2 <- which.min(abs(rfsrc_test$time.interest - t2))
@@ -160,7 +185,7 @@ rfsrc_in_loop <- function(p_number){
   truth2 <- data_test$time > t2
    #
   # Get the prediction of who rf thinks will survive > t
-  pred_train <- rfsrc_train$survival.oob[,m] >0.5 #rfsrc_train$survival[,m] > 0.5
+  pred_train <- rfsrc_train_CV$survival[,m] >0.5 #rfsrc_train$survival[,m] > 0.5
   pred_test <- rfsrc_test$survival[,m] >0.5 #rfsrc_train$survival.oob[,m] >0.5
   # Confusion matrix
   cm_train <- matrix(c(length(which(truth=="FALSE" & pred_train=="FALSE")),length(which(truth=="FALSE" & pred_train=="TRUE")),
@@ -183,6 +208,8 @@ rfsrc_in_loop <- function(p_number){
   #collect data in an array(replace 'a'th number in the array after each loop)
   Err_train[a]<<- accuracy_train
   Err_test[a]<<- accuracy_test
+  Sensitivity[a]<<-Sensitivity
+  Specificity[a]<<-Specificity
   a <<- a+1
   p_number<<-p_number
   }
@@ -191,6 +218,8 @@ rfsrc_in_loop <- function(p_number){
   #collect average accuary values of the model at different P values
   Avg_Err_train[b]<<- mean(x = Err_train)
   Avg_Err_test[b]<<- mean(x=Err_test)
+  Avg_sensitivity[b]<<-mean(x=Sensitivity)
+  Avg_specificity[b]<<-mean(x=Specificity)
   b<<-b+1
 }
 b<-1
@@ -198,13 +227,12 @@ b<-1
 for (i in c(1:5)){rfsrc_in_loop(P[i])}
 
 #create dataframes and combine with old data
-excelpath<-"~/GitHub/mscproject/Data/RSF_results.xlsx"
 
-df1 <-data.frame(p_n=P/N, test=Avg_Err_test, train=Avg_Err_train, stringsAsFactors=FALSE)
+df1 <-data.frame(p_n=log10(P/N), test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_sensitivity,Specificity=Avg_specificity, stringsAsFactors=FALSE)
 df1<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
-df2 <-data.frame(TV_P=TV/P, test=Avg_Err_test, train=Avg_Err_train, stringsAsFactors=FALSE)
+df2 <-data.frame(TV_P=log10(TV/P), test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_sensitivity, Specificity=Avg_specificity, stringsAsFactors=FALSE)
 df2<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
-df3 <-data.frame(TV_N=TV/N, test=Avg_Err_test, train=Avg_Err_train, stringsAsFactors=FALSE)
+df3 <-data.frame(TV_N=log10(TV/N), test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_sensitivity, Specificity=Avg_specificity, stringsAsFactors=FALSE)
 df3<-rbind(read.xlsx(excelpath, sheet="TV_N"), df3)
 
 #push combined data to a new excel file. 
@@ -220,3 +248,31 @@ addWorksheet(wb, "TV_N")
 writeData(wb,sheet="TV_N",df3)
 saveWorkbook(wb,excelpath, overwrite = TRUE)
 }
+
+
+#linear plot
+
+
+Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('test','train','Sensitivity','Specificity'))
+ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
+  geom_point() +
+  geom_smooth(method = "lm", alpha = .15, aes(fill = variable))+ theme_bw()+
+  facet_wrap(~variable)
+ggsave(paste0("RSF_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+
+Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('test','train','Sensitivity','Specificity'))
+ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
+  geom_point() +
+  geom_smooth(method = "lm", alpha = .15, aes(fill = variable))+ theme_bw()+
+  facet_wrap(~variable)
+ggsave(paste0("RSF_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+
+Vis_df3 <- melt(df3, id.vars = c('TV_N'), measure.vars = c('test','train','Sensitivity','Specificity'))
+ggplot(Vis_df3, aes(x = TV_N, y = value, color = variable) ) +
+  geom_point() +
+  geom_smooth(method = "lm", alpha = .15, aes(fill = variable))+ theme_bw()+
+  facet_wrap(~variable)
+ggsave(paste0("RSF_TV_N.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+
+
+
