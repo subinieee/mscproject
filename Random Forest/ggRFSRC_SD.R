@@ -7,13 +7,8 @@ library(caret)
 library(readr)
 library(openxlsx)
 
-Avg_Err_train<-c(1:5)
-Avg_Err_test<-c(1:5)
-Avg_Sensitivity<-c(1:5)
-Avg_Specificity<-c(1:5)
 
 a<-1
-b<-1
 excelpath<-"~/GitHub/mscproject/Data/RSF_results.xlsx"
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
@@ -205,47 +200,33 @@ strCol <- c("TRUE" = "red",
   accuracy_train <- (cm_train[1,1] + cm_train[2,2])/sum(cm_train)
   accuracy_test <-(cm_test[1,1] + cm_test[2,2])/sum(cm_test)
   #collect data in an array(replace 'a'th number in the array after each loop)
-  Err_train[a]<<- accuracy_train
-  Err_test[a]<<- accuracy_test
-  Sensitivity[a]<<-Sensitivity
-  Specificity[a]<<-Specificity
-  a <<- a+1
   p_number<<-p_number
-  }
-  #reset the "a" value to keep it =<3
-  a<<-1
+  df1<<-data.frame(p_n=P/N, test=Err_test, train=Err_train, Sensitivity=Sensitivity,Specificity=Specificity, stringsAsFactors=FALSE)
+  df1<<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
+  df2<<-data.frame(TV_P=TV/P, test=Err_test, train=Err_train, Sensitivity=Sensitivity, Specificity=Specificity, stringsAsFactors=FALSE)
+  df2<<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
+  df3<<-data.frame(TV_N=TV/N, test=Err_test, train=Err_train, Sensitivity=Sensitivity, Specificity=Specificity, stringsAsFactors=FALSE)
+  df3<<-rbind(read.xlsx(excelpath, sheet="TV_N"), df3)
   #collect average accuary values of the model at different P values
-  Avg_Err_train[b]<<- mean(x = Err_train)
-  Avg_Err_test[b]<<- mean(x=Err_test)
-  Avg_Sensitivity[b]<<-mean(x=Sensitivity)
-  Avg_Specificity[b]<<-mean(x=Specificity)
-  b<<-b+1
+  
+  
+  #push combined data to a new excel file. 
+  write.xlsx(df1,excelpath,sheetName="P_N", append=FALSE)
+  write.xlsx(df2,excelpath,sheetName="TV_P",append=TRUE)
+  write.xlsx(df3,excelpath,sheetName="TV_N", append=TRUE)
+  wb<-createWorkbook()
+  addWorksheet(wb, "P_N")
+  writeData(wb,sheet="P_N",df1)
+  addWorksheet(wb, "TV_P")
+  writeData(wb,sheet="TV_P",df2)
+  addWorksheet(wb, "TV_N")
+  writeData(wb,sheet="TV_N",df3)
+  saveWorkbook(wb,excelpath, overwrite = TRUE)
+  }
+  #create dataframes and combine with old data
 }
-b<-1
 # Run rfsrc for different datasets on the loop 
 for (i in c(1:5)){rfsrc_in_loop(P[i])}
-
-#create dataframes and combine with old data
-
-df1 <-data.frame(p_n=P/N, test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_Sensitivity,Specificity=Avg_Specificity, stringsAsFactors=FALSE)
-df1<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
-df2 <-data.frame(TV_P=TV/P, test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_Sensitivity, Specificity=Avg_Specificity, stringsAsFactors=FALSE)
-df2<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
-df3 <-data.frame(TV_N=TV/N, test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_Sensitivity, Specificity=Avg_Specificity, stringsAsFactors=FALSE)
-df3<-rbind(read.xlsx(excelpath, sheet="TV_N"), df3)
-
-#push combined data to a new excel file. 
-write.xlsx(df1,excelpath,sheetName="P_N", append=FALSE)
-write.xlsx(df2,excelpath,sheetName="TV_P",append=TRUE)
-write.xlsx(df3,excelpath,sheetName="TV_N", append=TRUE)
-wb<-createWorkbook()
-addWorksheet(wb, "P_N")
-writeData(wb,sheet="P_N",df1)
-addWorksheet(wb, "TV_P")
-writeData(wb,sheet="TV_P",df2)
-addWorksheet(wb, "TV_N")
-writeData(wb,sheet="TV_N",df3)
-saveWorkbook(wb,excelpath, overwrite = TRUE)
 }
 
 

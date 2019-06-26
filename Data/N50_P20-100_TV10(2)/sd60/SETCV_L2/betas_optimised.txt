@@ -1,0 +1,4 @@
+covariate1: beta[1]=0.641926(rank=2)
+covariate4: beta[4]=0.948275(rank=1)
+covariate35: beta[35]=0.487069(rank=4)
+covariate40: beta[40]=-0.529562(rank=3)
