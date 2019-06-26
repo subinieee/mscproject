@@ -1,4 +1,4 @@
-library(randomForestSRC)
+library(randomForestsRC)
 library(dplyr)
 library(ggplot2)
 library(ggRandomForests)
@@ -9,8 +9,8 @@ library(openxlsx)
 
 Avg_Err_train<-c(1:5)
 Avg_Err_test<-c(1:5)
-Avg_sensitivity<-c(1:5)
-Avg_specificity<-c(1:5)
+Avg_Sensitivity<-c(1:5)
+Avg_Specificity<-c(1:5)
 
 a<-1
 b<-1
@@ -23,7 +23,6 @@ saveWorkbook(wb,excelpath, overwrite = TRUE)
 TV <-10
 N_arr<-c(10,50,100)
 P<-c(20,40,60,80,100)
-
 
 for (k in c(1:3)){N<-N_arr[k]
 datasrc <-paste0("~/GitHub/mscproject/Data/Train data/N",N,"_P20-100_TV10")
@@ -77,9 +76,9 @@ rfsrc_in_loop <- function(p_number){
 #create a folder to contain the results
   dir.create(path=paste0("",datasrc,"/RSF",p_number,""))
 
-# Survival probability vs observation time
+# survival probability vs observation time
   plot(gg_dta) +
-    labs(y="Survival Probability", 
+    labs(y="survival Probability", 
        x="Observation Time(years)",
        color="Treatment", 
        fill="treatment") +
@@ -138,7 +137,7 @@ strCol <- c("TRUE" = "red",
   ggRFsrc <-plot(gg_rfsrc(rfsrc_train),alpha=0.2)+
     theme(legend.position="none")+
   scale_color_manual(values = strCol)+
-    labs(y="Survival Probability",
+    labs(y="survival Probability",
          x="Time(years)")+
     coord_cartesian(ylim=c(-0.01,1.01))
   show(ggRFsrc)
@@ -173,8 +172,8 @@ strCol <- c("TRUE" = "red",
 #Prediction Accuracy 
   #find cut-off time(median survival time)
   t<- median(data_train$time)
-  m <- which.min(abs(rfsrc_train_CV$time.interest - t))
-  t<- rfsrc_train_CV$time.interest[m]  
+  m <- which.min(abs(rfsrc_train$time.interest - t))
+  t<- rfsrc_train$time.interest[m]  
   
   t2<- median(data_test$time)
   m2 <- which.min(abs(rfsrc_test$time.interest - t2))
@@ -185,7 +184,7 @@ strCol <- c("TRUE" = "red",
   truth2 <- data_test$time > t2
    #
   # Get the prediction of who rf thinks will survive > t
-  pred_train <- rfsrc_train_CV$survival[,m] >0.5 #rfsrc_train$survival[,m] > 0.5
+  pred_train <- rfsrc_train$OOB.survival[,m] >0.5 #rfsrc_train$survival[,m] > 0.5
   pred_test <- rfsrc_test$survival[,m] >0.5 #rfsrc_train$survival.oob[,m] >0.5
   # Confusion matrix
   cm_train <- matrix(c(length(which(truth=="FALSE" & pred_train=="FALSE")),length(which(truth=="FALSE" & pred_train=="TRUE")),
@@ -218,8 +217,8 @@ strCol <- c("TRUE" = "red",
   #collect average accuary values of the model at different P values
   Avg_Err_train[b]<<- mean(x = Err_train)
   Avg_Err_test[b]<<- mean(x=Err_test)
-  Avg_sensitivity[b]<<-mean(x=Sensitivity)
-  Avg_specificity[b]<<-mean(x=Specificity)
+  Avg_Sensitivity[b]<<-mean(x=Sensitivity)
+  Avg_Specificity[b]<<-mean(x=Specificity)
   b<<-b+1
 }
 b<-1
@@ -228,11 +227,11 @@ for (i in c(1:5)){rfsrc_in_loop(P[i])}
 
 #create dataframes and combine with old data
 
-df1 <-data.frame(p_n=log10(P/N), test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_sensitivity,Specificity=Avg_specificity, stringsAsFactors=FALSE)
+df1 <-data.frame(p_n=P/N, test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_Sensitivity,Specificity=Avg_Specificity, stringsAsFactors=FALSE)
 df1<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
-df2 <-data.frame(TV_P=log10(TV/P), test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_sensitivity, Specificity=Avg_specificity, stringsAsFactors=FALSE)
+df2 <-data.frame(TV_P=TV/P, test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_Sensitivity, Specificity=Avg_Specificity, stringsAsFactors=FALSE)
 df2<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
-df3 <-data.frame(TV_N=log10(TV/N), test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_sensitivity, Specificity=Avg_specificity, stringsAsFactors=FALSE)
+df3 <-data.frame(TV_N=TV/N, test=Avg_Err_test, train=Avg_Err_train, Sensitivity=Avg_Sensitivity, Specificity=Avg_Specificity, stringsAsFactors=FALSE)
 df3<-rbind(read.xlsx(excelpath, sheet="TV_N"), df3)
 
 #push combined data to a new excel file. 
@@ -253,26 +252,57 @@ saveWorkbook(wb,excelpath, overwrite = TRUE)
 #linear plot
 
 
-Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('test','train','Sensitivity','Specificity'))
+cbPalette <- c("#006633", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('test','train'))
 ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
-  geom_point() +
-  geom_smooth(method = "lm", alpha = .15, aes(fill = variable))+ theme_bw()+
-  facet_wrap(~variable)
-ggsave(paste0("RSF_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+  geom_point(aes(shape=variable),size = 3) +
+  labs(y = "Prediction Accuracy", x = "Features/Data")+
+  geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
+  theme(plot.title = element_text(size=14, face="bold.italic"),
+        axis.title.x = element_text(size=14, face="bold"),
+        axis.title.y = element_text(size=14, face="bold"))+
+  scale_x_continuous(trans = 'log2') +
+  ylim(NA,1)
+ggsave(paste0("RSF predacc_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
-Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('test','train','Sensitivity','Specificity'))
+Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('test','train'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
-  geom_point() +
-  geom_smooth(method = "lm", alpha = .15, aes(fill = variable))+ theme_bw()+
-  facet_wrap(~variable)
-ggsave(paste0("RSF_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+  geom_point(aes(shape=variable),size = 3) +
+  labs(y = "Prediction Accuracy", x = "True Covariates/Features")+
+  geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
+  theme(plot.title = element_text(size=14, face="bold.italic"),
+        axis.title.x = element_text(size=14, face="bold"),
+        axis.title.y = element_text(size=14, face="bold"))+
+  scale_x_continuous(trans = 'log2') +
+  ylim(NA,1)
+ggsave(paste0("RSF predacc_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
-Vis_df3 <- melt(df3, id.vars = c('TV_N'), measure.vars = c('test','train','Sensitivity','Specificity'))
-ggplot(Vis_df3, aes(x = TV_N, y = value, color = variable) ) +
-  geom_point() +
-  geom_smooth(method = "lm", alpha = .15, aes(fill = variable))+ theme_bw()+
-  facet_wrap(~variable)
-ggsave(paste0("RSF_TV_N.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('Sensitivity','Specificity'))
+ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) + 
+  geom_point(aes(shape=variable),size = 3) +
+  scale_colour_manual(values=cbPalette)+
+  scale_fill_manual(values=cbPalette)+
+  labs(y = "Prediction Accuracy", x = "Features/Data")+
+  geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
+  theme(plot.title = element_text(size=14, face="bold.italic"),
+        axis.title.x = element_text(size=14, face="bold"),
+        axis.title.y = element_text(size=14, face="bold"))+
+  scale_x_continuous(trans = 'log2') +
+  ylim(NA,1)
+  ggsave(paste0("RSF select_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
-
+Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('Sensitivity','Specificity'))
+ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
+  geom_point(aes(shape=variable),size = 3) +
+  scale_colour_manual(values=cbPalette)+
+  scale_fill_manual(values=cbPalette)+
+  labs(y = "Prediction Accuracy", x = "Features/Data")+
+  geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
+  theme(plot.title = element_text(size=14, face="bold.italic"),
+        axis.title.x = element_text(size=14, face="bold"),
+        axis.title.y = element_text(size=14, face="bold"))+
+  scale_x_continuous(trans = 'log2') +
+  ylim(NA,1)
+ggsave(paste0("RSF select_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
