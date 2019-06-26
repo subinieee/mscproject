@@ -1,0 +1,2 @@
+covariate19: beta[19]=1.772402(rank=1)
+covariate39: beta[39]=-1.185379(rank=2)
