@@ -1,4 +1,4 @@
-Thu Jun 20 17:04:52 2019
+Mon Jun 24 17:29:57 2019
    generating synthetic survival data
 normalizing data ...
    N=10, P=40, risk=1
@@ -15,7 +15,7 @@ covariate selection: error expectation minimisation
 nr of training sets per iteration: 200
 HYPERPARAMETER_CONTROL=3
 duration of batch loop: 0.000116 days
-proposed nr of covariates, test data performance: 11
+proposed nr of covariates, test data performance: 10
 proposed nr of covariates, avoiding overfitting:  1
 calculating error bars ...
 returning allocated memory ...

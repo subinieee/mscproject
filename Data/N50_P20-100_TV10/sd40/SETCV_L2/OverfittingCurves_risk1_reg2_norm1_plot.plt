@@ -8,7 +8,7 @@ set nologscale x
 set nologscale y
 set xrange [0.000000:41.000000]
 set yrange [0.500000:1.000000]
-set title "prediction accuracy, cutoff=2.619155 (risk=1, reg=2, norm=1)"
+set title "prediction accuracy, cutoff=1.921125 (risk=1, reg=2, norm=1)"
 set xlabel "nr of covariates"
 set ylabel ""
 set terminal postscript eps color

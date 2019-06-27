@@ -1,0 +1,1 @@
+covariate18: beta[18]=-1.055908(rank=1)
