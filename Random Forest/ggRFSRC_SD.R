@@ -1,4 +1,4 @@
-library(randomForestsRC)
+library(randomForestSRC)
 library(dplyr)
 library(ggplot2)
 library(ggRandomForests)
@@ -9,19 +9,21 @@ library(openxlsx)
 
 
 a<-1
-b<-1
 excelpath<-"~/GitHub/mscproject/Data/RSF_results.xlsx"
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
 addWorksheet(wb, "TV_N")
-saveWorkbook(wb,excelpath, overwrite = TRUE)
+saveWorkbook(wb,excelpath, overwrite = FALSE)
+
+nrdata<-1
+nrtestdata<-2
 TV <-10
 N_arr<-c(10,50,100)
 P<-c(20,40,60,80,100)
 
 for (k in c(1:3)){N<<-N_arr[k]
-datasrc <-paste0("~/GitHub/mscproject/Data/Train data/N",N,"_P20-100_TV10")
+datasrc <-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")")
 #Function for repeating RF with different datasets on a loop.
 rfsrc_in_loop <- function(p_number){
   Err_train <<-c(1:3)
@@ -32,14 +34,14 @@ rfsrc_in_loop <- function(p_number){
   for (j in c(1:3)){
 # Data cleaning (read .dat file and remove index column)
   set.seed(j)
-  data_train <-read.delim(paste0("",datasrc,"/SD",p_number,".dat"), 
+  data_train <-read.delim(paste0("",datasrc,"/sd",p_number,"/SD",p_number,".dat"), 
                      skip=3, 
                      sep=(" "),
                      nrows=N, 
                      header = FALSE, 
                      stringsAsFactors = FALSE)
   data_train <- data_train[,-1]
-  data_test <-read.delim(paste0("~/GitHub/mscproject/Data/test data/data/SD_test",p_number,".dat"),
+  data_test <-read.delim(paste0("~/GitHub/mscproject/Data/test data(",nrtestdata,")/sd",p_number,"_test/SD",p_number,".dat"),
                          skip=3, 
                          sep=(" "),
                          nrows=100, 
@@ -48,21 +50,22 @@ rfsrc_in_loop <- function(p_number){
   data_test <- data_test[,-1]
 
 #column names
-
   col_names <-list(1:ncol(data_train))
   col_names <-paste0("","A",col_names[[1]],"")
   colnames(data_train) <-col_names
   colnames(data_train)[length(colnames(data_train))-1] <- "time"
   colnames(data_train)[length(colnames(data_train))] <- "event"
   data_train$event <-as.numeric(data_train$event)
-  
+  #
+  censored_before<-which(data_train$time[which(data_train$event==0)]<median(data_train$time))
+  #
+  data_train$event <-as.numeric(data_train$event)
   col_names <-list(1:ncol(data_test))
   col_names <-paste0("","A",col_names[[1]],"")
   colnames(data_test) <-col_names
   colnames(data_test)[length(colnames(data_test))-1] <- "time"
   colnames(data_test)[length(colnames(data_test))] <- "event"
   data_test$event <-as.numeric(data_test$event)
-
 # Create the gg_survival object
   gg_dta <- gg_survival(interval="time",
                       censor="event",
@@ -94,7 +97,7 @@ rfsrc_in_loop <- function(p_number){
   ggsave("cum_hazard.png", plot=last_plot(),path=savepath)
   
 #train set train (default nodesize is 15 for survival family - the paper used 3)
-  rfsrc_train <- rfsrc(Surv(time,event) ~ .,
+  rfsrc_train <<- rfsrc(Surv(time,event) ~ .,
                        ntree = 1000,
                        nodesize = 3,
                        data=data_train,
@@ -102,17 +105,19 @@ rfsrc_in_loop <- function(p_number){
                        na.action="na.impute",
                        tree.err=TRUE, 
                        importance=TRUE)
+ capture.output(summary(rfsrc_train),file=paste0("",savepath,"/summary_train.txt",""))
+  print(rfsrc_train)
+  capture.output(print(rfsrc_train),file=paste0("",savepath,"/print_train.txt",""))  
+# would it be more accurate to measure the prediction accuracy by running the model with entire train data set?  
   
-  rfsrc_train_CV <- predict(rfsrc_train, 
+  rfsrc_train_CV <<- predict(rfsrc_train, 
                         newdata = data_train,
                         na.action = "na.impute",
                         importance = TRUE)
   
-  capture.output(summary(rfsrc_train_CV),file=paste0("",savepath,"/summary_train.txt",""))
-  print(rfsrc_train_CV)
-  capture.output(print(rfsrc_train_CV),file=paste0("",savepath,"/print_train.txt",""))
+ 
 #test set predictions  
-  rfsrc_test <- predict(rfsrc_train, 
+  rfsrc_test <<- predict(rfsrc_train, 
                         newdata = data_test,
                         na.action = "na.impute",
                         importance = TRUE)
@@ -120,6 +125,31 @@ rfsrc_in_loop <- function(p_number){
   capture.output(summary(rfsrc_test),file=paste0("",savepath,"/summary_test.txt",""))
   print(rfsrc_test)
   capture.output(print(rfsrc_test),file=paste0("",savepath,"/print_test.txt",""))
+  
+#save survival prediction data
+if(j==1){
+  wb2<-createWorkbook()
+  addWorksheet(wb2, "Train_Survival")
+  addWorksheet(wb2, "Train_Survival.oob")
+  addWorksheet(wb2, "Train_CV_Survival")
+  addWorksheet(wb2, "Test_Survival")
+  saveWorkbook(wb2,paste0("",savepath,"/RSF_resultsDB.xlsx",""), overwrite = TRUE)}
+  
+  survivalDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"),seed=j,rfsrc_train$survival)
+  df4<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""),sheet="Train_Survival"), survivalDB)
+  survivaloobDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")",seed=j),rfsrc_train$survival.oob)
+  df5<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""),sheet = "Train_Survival.oob"), survivaloobDB)
+  CVsurvivalDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")",seed=j),rfsrc_train_CV$survival)
+  df6<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""), sheet="Train_CV_Survival"), CVsurvivalDB)
+  testsurvivalDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")",seed=j), rfsrc_test$survival)
+  df7<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""), sheet="Test_Survival"), testsurvivalDB)
+  
+  writeData(wb2,sheet="Train_Survival",df4)
+  writeData(wb2,sheet="Train_Survival.oob",df5)
+  writeData(wb2,sheet="Train_CV_Survival",df6)
+  writeData(wb2,sheet="Test_Survival",df7)
+  saveWorkbook(wb2,paste0("",savepath,"/RSF_resultsDB.xlsx",""), overwrite = TRUE)
+  
 #Generalisation error
   gg_error1<-gg_error(rfsrc_train)
   plot(na.omit(gg_error1))  
@@ -175,11 +205,17 @@ strCol <- c("TRUE" = "red",
   t2<- rfsrc_test$time.interest[m2]  
   #
   # Get the ground truth as a vector of who did survive beyond t
-  truth <- data_train$time > t
+  truth <- data_train$time >t2
+  if(length(censored_before)!=0){
+    truth <- data_train$time[-censored_before] > t
+    }
   truth2 <- data_test$time > t2
    #
   # Get the prediction of who rf thinks will survive > t
   pred_train <- rfsrc_train$survival.oob[,m] >0.5 #rfsrc_train$survival[,m] > 0.5
+  if(length(censored_before)!=0){
+    pred_train <-pred_train[-censored_before]
+  }
   pred_test <- rfsrc_test$survival[,m] >0.5 #rfsrc_train$survival.oob[,m] >0.5
   # Confusion matrix
   cm_train <- matrix(c(length(which(truth=="FALSE" & pred_train=="FALSE")),length(which(truth=="FALSE" & pred_train=="TRUE")),
@@ -211,17 +247,14 @@ strCol <- c("TRUE" = "red",
   #collect average accuary values of the model at different P values
   #create dataframes and combine with old data
   
-  df1<<-data.frame(p_n=P[i]/N_arr[k], test=Err_test, train=Err_train, precision_var=precision_var, stringsAsFactors=FALSE)
+  df1<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, seed=c(1:3),p_n=P[i]/N_arr[k], test=Err_test, train=Err_train, precision_var=precision_var, stringsAsFactors=FALSE)
   df1<<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
-  df2<<-data.frame(TV_P=TV/P[i], test=Err_test, train=Err_train,precision_var=precision_var, stringsAsFactors=FALSE)
+  df2<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, seed=c(1:3),TV_P=TV/P[i], test=Err_test, train=Err_train,precision_var=precision_var, stringsAsFactors=FALSE)
   df2<<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
-  df3<<-data.frame(TV_N=TV/N_arr[k], test=Err_test, train=Err_train, precision_var=precision_var, stringsAsFactors=FALSE)
+  df3<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, seed=c(1:3),TV_N=TV/N_arr[k], test=Err_test, train=Err_train, precision_var=precision_var, stringsAsFactors=FALSE)
   df3<<-rbind(read.xlsx(excelpath, sheet="TV_N"), df3)
   
   #push combined data to a new excel file. 
-  write.xlsx(df1,excelpath,sheetName="P_N", append=FALSE)
-  write.xlsx(df2,excelpath,sheetName="TV_P",append=TRUE)
-  write.xlsx(df3,excelpath,sheetName="TV_N", append=TRUE)
   wb<-createWorkbook()
   addWorksheet(wb, "P_N")
   writeData(wb,sheet="P_N",df1)
@@ -271,7 +304,7 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
   geom_point(aes(shape=variable),size = 3) +
   scale_colour_manual(values=cbPalette)+
   scale_fill_manual(values=cbPalette)+
-  labs(y = "precision_var", x = "Features/Data")+
+  labs(y = "Precision", x = "Features/Data")+
   geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
   theme(plot.title = element_text(size=14, face="bold.italic"),
         axis.title.x = element_text(size=14, face="bold"),
@@ -285,7 +318,7 @@ ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
   geom_point(aes(shape=variable),size = 3) +
   scale_colour_manual(values=cbPalette)+
   scale_fill_manual(values=cbPalette)+
-  labs(y = "precision_var", x = "True Covariates/Features")+
+  labs(y = "Precision", x = "True Covariates/Features")+
   geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
   theme(plot.title = element_text(size=14, face="bold.italic"),
         axis.title.x = element_text(size=14, face="bold"),

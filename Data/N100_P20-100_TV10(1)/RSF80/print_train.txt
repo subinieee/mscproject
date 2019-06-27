@@ -1,0 +1,16 @@
+                         Sample size: 100
+                    Number of deaths: 69
+                    Was data imputed: yes
+                     Number of trees: 1000
+           Forest terminal node size: 3
+       Average no. of terminal nodes: 25.204
+No. of variables tried at each split: 9
+              Total no. of variables: 80
+       Resampling used to grow trees: swor
+    Resample size used to grow trees: 63
+                            Analysis: RSF
+                              Family: surv
+                      Splitting rule: logrank *random*
+       Number of random split points: 10
+                          Error rate: 53.05%
+

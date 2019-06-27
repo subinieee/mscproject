@@ -1,0 +1,12 @@
+  Sample size of test (predict) data: 100
+       Number of deaths in test data: 67
+               Was test data imputed: yes
+                Number of grow trees: 1000
+  Average no. of grow terminal nodes: 24.175
+         Total no. of grow variables: 40
+       Resampling used to grow trees: swor
+    Resample size used to grow trees: 63
+                            Analysis: RSF
+                              Family: surv
+                 Test set error rate: 38.41%
+
