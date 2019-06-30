@@ -1,1 +1,0 @@
-early censoring (0%):  class 0: 0/0  class 1: 0/0  
