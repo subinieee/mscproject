@@ -16,6 +16,6 @@ nr of training sets per iteration: 200
 HYPERPARAMETER_CONTROL=3
 duration of batch loop: 0.000023 days
 proposed nr of covariates, test data performance: 3
-proposed nr of covariates, avoiding overfitting:  1
+proposed nr of covariates, avoiding overfitting:  2
 calculating error bars ...
 returning allocated memory ...
