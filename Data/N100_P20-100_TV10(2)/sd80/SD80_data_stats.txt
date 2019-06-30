@@ -1,80 +1,80 @@
-covariate 1:   name=covariate1, type=float, missing=  6 of 100, average=-0.153672, stdev=0.865464, range=[-2.503580,1.922456], active=1
-covariate 2:   name=covariate2, type=float, missing=  4 of 100, average=-0.173713, stdev=0.880928, range=[-2.295743,2.311380], active=1
-covariate 3:   name=covariate3, type=float, missing=  2 of 100, average=0.016620, stdev=1.056181, range=[-2.121793,3.344217], active=1
-covariate 4:   name=covariate4, type=float, missing=  3 of 100, average=0.038214, stdev=1.036556, range=[-2.950388,2.926996], active=1
-covariate 5:   name=covariate5, type=float, missing=  3 of 100, average=0.021144, stdev=0.973995, range=[-1.733826,3.722501], active=1
-covariate 6:   name=covariate6, type=float, missing=  6 of 100, average=0.107405, stdev=0.964982, range=[-2.163718,2.847565], active=1
-covariate 7:   name=covariate7, type=float, missing=  4 of 100, average=0.104741, stdev=1.063461, range=[-2.655537,3.053935], active=1
-covariate 8:   name=covariate8, type=float, missing=  5 of 100, average=0.020326, stdev=1.026724, range=[-2.664447,2.186114], active=1
-covariate 9:   name=covariate9, type=float, missing=  4 of 100, average=-0.066642, stdev=0.972802, range=[-2.444218,1.958470], active=1
-covariate 10:  name=covariate10, type=float, missing=  5 of 100, average=0.094897, stdev=1.006568, range=[-2.035524,2.418923], active=1
-covariate 11:  name=covariate11, type=float, missing=  4 of 100, average=0.050467, stdev=0.886715, range=[-2.501755,1.829130], active=1
-covariate 12:  name=covariate12, type=float, missing=  6 of 100, average=0.057953, stdev=1.079982, range=[-2.915664,2.487892], active=1
-covariate 13:  name=covariate13, type=float, missing=  7 of 100, average=0.062541, stdev=0.848147, range=[-2.143320,1.844989], active=1
-covariate 14:  name=covariate14, type=float, missing=  8 of 100, average=-0.281640, stdev=0.950881, range=[-3.854815,1.965998], active=1
-covariate 15:  name=covariate15, type=float, missing=  5 of 100, average=0.073659, stdev=1.045563, range=[-2.842893,2.045488], active=1
-covariate 16:  name=covariate16, type=float, missing=  5 of 100, average=0.100632, stdev=0.887397, range=[-2.459787,2.080624], active=1
-covariate 17:  name=covariate17, type=float, missing=  3 of 100, average=-0.013944, stdev=1.040505, range=[-2.354408,2.384956], active=1
-covariate 18:  name=covariate18, type=float, missing=  6 of 100, average=-0.072870, stdev=0.823717, range=[-2.210716,2.320153], active=1
-covariate 19:  name=covariate19, type=float, missing=  6 of 100, average=0.029370, stdev=1.009696, range=[-2.997884,2.430619], active=1
-covariate 20:  name=covariate20, type=float, missing= 10 of 100, average=0.047812, stdev=0.899796, range=[-2.285455,2.699105], active=1
-covariate 21:  name=covariate21, type=float, missing=  4 of 100, average=-0.086428, stdev=1.136720, range=[-2.714469,2.310357], active=1
-covariate 22:  name=covariate22, type=float, missing=  4 of 100, average=0.056814, stdev=1.073413, range=[-2.350632,3.422423], active=1
-covariate 23:  name=covariate23, type=float, missing=  5 of 100, average=0.190736, stdev=0.986686, range=[-1.862685,2.485945], active=1
-covariate 24:  name=covariate24, type=float, missing=  3 of 100, average=-0.031477, stdev=0.963271, range=[-2.411782,3.069017], active=1
-covariate 25:  name=covariate25, type=float, missing=  5 of 100, average=0.077341, stdev=0.918207, range=[-2.347293,2.068942], active=1
-covariate 26:  name=covariate26, type=float, missing=  9 of 100, average=-0.181359, stdev=0.886334, range=[-2.811080,1.533175], active=1
-covariate 27:  name=covariate27, type=float, missing=  3 of 100, average=-0.119222, stdev=1.037603, range=[-2.718474,2.166046], active=1
-covariate 28:  name=covariate28, type=float, missing= 11 of 100, average=0.041343, stdev=0.955139, range=[-2.733726,2.383375], active=1
-covariate 29:  name=covariate29, type=float, missing=  4 of 100, average=0.091415, stdev=1.105882, range=[-2.435438,2.757434], active=1
-covariate 30:  name=covariate30, type=float, missing=  3 of 100, average=-0.027864, stdev=0.961550, range=[-2.640330,1.911973], active=1
-covariate 31:  name=covariate31, type=float, missing=  4 of 100, average=0.027933, stdev=1.008486, range=[-1.872433,2.524416], active=1
-covariate 32:  name=covariate32, type=float, missing=  9 of 100, average=-0.065359, stdev=0.813351, range=[-2.140154,1.586135], active=1
-covariate 33:  name=covariate33, type=float, missing=  7 of 100, average=0.011053, stdev=0.912752, range=[-2.061547,2.757646], active=1
-covariate 34:  name=covariate34, type=float, missing=  8 of 100, average=0.073348, stdev=0.962442, range=[-2.486543,2.639955], active=1
-covariate 35:  name=covariate35, type=float, missing=  2 of 100, average=-0.001372, stdev=1.011149, range=[-2.016208,2.819297], active=1
-covariate 36:  name=covariate36, type=float, missing=  6 of 100, average=0.055106, stdev=1.147757, range=[-2.890601,2.811053], active=1
-covariate 37:  name=covariate37, type=float, missing=  6 of 100, average=-0.050313, stdev=0.971397, range=[-2.639553,1.956199], active=1
-covariate 38:  name=covariate38, type=float, missing=  8 of 100, average=0.208914, stdev=1.049318, range=[-2.170698,2.969183], active=1
-covariate 39:  name=covariate39, type=float, missing=  5 of 100, average=0.011651, stdev=0.943795, range=[-2.677406,1.965571], active=1
-covariate 40:  name=covariate40, type=float, missing=  3 of 100, average=-0.049574, stdev=1.010965, range=[-3.184111,3.030658], active=1
-covariate 41:  name=covariate41, type=float, missing=  6 of 100, average=0.205625, stdev=0.949820, range=[-2.808491,2.333413], active=1
-covariate 42:  name=covariate42, type=float, missing=  8 of 100, average=0.013636, stdev=1.065634, range=[-2.751852,2.614698], active=1
-covariate 43:  name=covariate43, type=float, missing=  6 of 100, average=0.049671, stdev=1.108988, range=[-2.116927,3.032130], active=1
-covariate 44:  name=covariate44, type=float, missing=  3 of 100, average=-0.212568, stdev=0.926770, range=[-2.229853,2.048888], active=1
-covariate 45:  name=covariate45, type=float, missing=  4 of 100, average=-0.026846, stdev=0.921013, range=[-2.391836,2.031770], active=1
-covariate 46:  name=covariate46, type=float, missing=  2 of 100, average=0.145110, stdev=1.216097, range=[-4.225883,2.753848], active=1
-covariate 47:  name=covariate47, type=float, missing=  3 of 100, average=-0.016757, stdev=1.039420, range=[-2.606483,2.260656], active=1
-covariate 48:  name=covariate48, type=float, missing=  6 of 100, average=0.003170, stdev=0.960310, range=[-2.446946,2.670396], active=1
-covariate 49:  name=covariate49, type=float, missing=  4 of 100, average=-0.057427, stdev=0.960744, range=[-2.671420,2.346944], active=1
-covariate 50:  name=covariate50, type=float, missing=  8 of 100, average=0.026129, stdev=0.900063, range=[-1.869345,2.455641], active=1
-covariate 51:  name=covariate51, type=float, missing=  3 of 100, average=0.040183, stdev=0.967139, range=[-2.757947,2.605705], active=1
-covariate 52:  name=covariate52, type=float, missing=  4 of 100, average=-0.217417, stdev=0.913159, range=[-2.303444,2.748616], active=1
-covariate 53:  name=covariate53, type=float, missing=  4 of 100, average=-0.150865, stdev=1.007125, range=[-2.427665,2.294873], active=1
-covariate 54:  name=covariate54, type=float, missing=  6 of 100, average=-0.060514, stdev=0.938159, range=[-2.395766,2.055314], active=1
-covariate 55:  name=covariate55, type=float, missing=  7 of 100, average=-0.079012, stdev=0.922375, range=[-2.700065,2.413592], active=1
-covariate 56:  name=covariate56, type=float, missing=  7 of 100, average=-0.023018, stdev=0.939467, range=[-2.043441,1.970072], active=1
-covariate 57:  name=covariate57, type=float, missing=  9 of 100, average=-0.012259, stdev=1.162612, range=[-3.721842,2.919266], active=1
-covariate 58:  name=covariate58, type=float, missing=  1 of 100, average=-0.098537, stdev=0.998580, range=[-2.912216,2.366891], active=1
-covariate 59:  name=covariate59, type=float, missing=  4 of 100, average=0.014908, stdev=1.190006, range=[-3.278070,2.626200], active=1
-covariate 60:  name=covariate60, type=float, missing=  5 of 100, average=0.003277, stdev=0.954861, range=[-2.644506,2.171412], active=1
-covariate 61:  name=covariate61, type=float, missing=  8 of 100, average=-0.115129, stdev=1.025947, range=[-2.708062,2.280763], active=1
-covariate 62:  name=covariate62, type=float, missing=  2 of 100, average=-0.013728, stdev=0.961426, range=[-2.412399,2.004851], active=1
-covariate 63:  name=covariate63, type=float, missing=  5 of 100, average=-0.072063, stdev=1.140821, range=[-3.459016,2.455169], active=1
-covariate 64:  name=covariate64, type=float, missing=  5 of 100, average=0.044570, stdev=0.986133, range=[-2.665205,2.557168], active=1
-covariate 65:  name=covariate65, type=float, missing=  3 of 100, average=-0.108974, stdev=0.977082, range=[-2.206319,2.728817], active=1
-covariate 66:  name=covariate66, type=float, missing=  6 of 100, average=0.034032, stdev=0.986039, range=[-2.525518,2.376208], active=1
-covariate 67:  name=covariate67, type=float, missing=  3 of 100, average=-0.067138, stdev=0.921703, range=[-1.971004,2.638406], active=1
-covariate 68:  name=covariate68, type=float, missing=  6 of 100, average=0.076358, stdev=1.043157, range=[-2.584402,2.465630], active=1
-covariate 69:  name=covariate69, type=float, missing=  3 of 100, average=0.106907, stdev=0.974906, range=[-2.497363,2.672795], active=1
-covariate 70:  name=covariate70, type=float, missing=  2 of 100, average=-0.196220, stdev=1.004908, range=[-2.482409,2.074642], active=1
-covariate 71:  name=covariate71, type=float, missing=  9 of 100, average=-0.082284, stdev=1.077681, range=[-2.976458,2.546805], active=1
-covariate 72:  name=covariate72, type=float, missing=  8 of 100, average=0.072364, stdev=1.101143, range=[-1.994820,2.532809], active=1
-covariate 73:  name=covariate73, type=float, missing=  6 of 100, average=0.080940, stdev=1.021740, range=[-2.713487,2.738737], active=1
-covariate 74:  name=covariate74, type=float, missing=  5 of 100, average=-0.112595, stdev=0.992960, range=[-2.568438,2.857256], active=1
-covariate 75:  name=covariate75, type=float, missing=  5 of 100, average=-0.021730, stdev=0.942359, range=[-1.757007,2.389453], active=1
-covariate 76:  name=covariate76, type=float, missing=  3 of 100, average=0.006803, stdev=1.013647, range=[-2.807985,2.122590], active=1
-covariate 77:  name=covariate77, type=float, missing=  7 of 100, average=0.047598, stdev=0.903362, range=[-1.852669,2.365432], active=1
-covariate 78:  name=covariate78, type=float, missing=  4 of 100, average=-0.052406, stdev=0.995810, range=[-2.288642,2.584384], active=1
-covariate 79:  name=covariate79, type=float, missing=  5 of 100, average=-0.090257, stdev=0.954669, range=[-2.677858,2.319220], active=1
-covariate 80:  name=covariate80, type=float, missing=  4 of 100, average=-0.028890, stdev=1.010625, range=[-2.506374,2.237312], active=1
+covariate 1:   type=float, missing=  6 of 100, average=-0.153672, stdev=0.865464, range=[-2.503580,1.922456], active=1
+covariate 2:   type=float, missing=  4 of 100, average=-0.173713, stdev=0.880928, range=[-2.295743,2.311380], active=1
+covariate 3:   type=float, missing=  2 of 100, average=0.016620, stdev=1.056181, range=[-2.121793,3.344217], active=1
+covariate 4:   type=float, missing=  3 of 100, average=0.038214, stdev=1.036556, range=[-2.950388,2.926996], active=1
+covariate 5:   type=float, missing=  3 of 100, average=0.021144, stdev=0.973995, range=[-1.733826,3.722501], active=1
+covariate 6:   type=float, missing=  6 of 100, average=0.107405, stdev=0.964982, range=[-2.163718,2.847565], active=1
+covariate 7:   type=float, missing=  4 of 100, average=0.104741, stdev=1.063461, range=[-2.655537,3.053935], active=1
+covariate 8:   type=float, missing=  5 of 100, average=0.020326, stdev=1.026724, range=[-2.664447,2.186114], active=1
+covariate 9:   type=float, missing=  4 of 100, average=-0.066642, stdev=0.972802, range=[-2.444218,1.958470], active=1
+covariate 10:  type=float, missing=  5 of 100, average=0.094897, stdev=1.006568, range=[-2.035524,2.418923], active=1
+covariate 11:  type=float, missing=  4 of 100, average=0.050467, stdev=0.886715, range=[-2.501755,1.829130], active=1
+covariate 12:  type=float, missing=  6 of 100, average=0.057953, stdev=1.079982, range=[-2.915664,2.487892], active=1
+covariate 13:  type=float, missing=  7 of 100, average=0.062541, stdev=0.848147, range=[-2.143320,1.844989], active=1
+covariate 14:  type=float, missing=  8 of 100, average=-0.281640, stdev=0.950881, range=[-3.854815,1.965998], active=1
+covariate 15:  type=float, missing=  5 of 100, average=0.073659, stdev=1.045563, range=[-2.842893,2.045488], active=1
+covariate 16:  type=float, missing=  5 of 100, average=0.100632, stdev=0.887397, range=[-2.459787,2.080624], active=1
+covariate 17:  type=float, missing=  3 of 100, average=-0.013944, stdev=1.040505, range=[-2.354408,2.384956], active=1
+covariate 18:  type=float, missing=  6 of 100, average=-0.072870, stdev=0.823717, range=[-2.210716,2.320153], active=1
+covariate 19:  type=float, missing=  6 of 100, average=0.029370, stdev=1.009696, range=[-2.997884,2.430619], active=1
+covariate 20:  type=float, missing= 10 of 100, average=0.047812, stdev=0.899796, range=[-2.285455,2.699105], active=1
+covariate 21:  type=float, missing=  4 of 100, average=-0.086428, stdev=1.136720, range=[-2.714469,2.310357], active=1
+covariate 22:  type=float, missing=  4 of 100, average=0.056814, stdev=1.073413, range=[-2.350632,3.422423], active=1
+covariate 23:  type=float, missing=  5 of 100, average=0.190736, stdev=0.986686, range=[-1.862685,2.485945], active=1
+covariate 24:  type=float, missing=  3 of 100, average=-0.031477, stdev=0.963271, range=[-2.411782,3.069017], active=1
+covariate 25:  type=float, missing=  5 of 100, average=0.077341, stdev=0.918207, range=[-2.347293,2.068942], active=1
+covariate 26:  type=float, missing=  9 of 100, average=-0.181359, stdev=0.886334, range=[-2.811080,1.533175], active=1
+covariate 27:  type=float, missing=  3 of 100, average=-0.119222, stdev=1.037603, range=[-2.718474,2.166046], active=1
+covariate 28:  type=float, missing= 11 of 100, average=0.041343, stdev=0.955139, range=[-2.733726,2.383375], active=1
+covariate 29:  type=float, missing=  4 of 100, average=0.091415, stdev=1.105882, range=[-2.435438,2.757434], active=1
+covariate 30:  type=float, missing=  3 of 100, average=-0.027864, stdev=0.961550, range=[-2.640330,1.911973], active=1
+covariate 31:  type=float, missing=  4 of 100, average=0.027933, stdev=1.008486, range=[-1.872433,2.524416], active=1
+covariate 32:  type=float, missing=  9 of 100, average=-0.065359, stdev=0.813351, range=[-2.140154,1.586135], active=1
+covariate 33:  type=float, missing=  7 of 100, average=0.011053, stdev=0.912752, range=[-2.061547,2.757646], active=1
+covariate 34:  type=float, missing=  8 of 100, average=0.073348, stdev=0.962442, range=[-2.486543,2.639955], active=1
+covariate 35:  type=float, missing=  2 of 100, average=-0.001372, stdev=1.011149, range=[-2.016208,2.819297], active=1
+covariate 36:  type=float, missing=  6 of 100, average=0.055106, stdev=1.147757, range=[-2.890601,2.811053], active=1
+covariate 37:  type=float, missing=  6 of 100, average=-0.050313, stdev=0.971397, range=[-2.639553,1.956199], active=1
+covariate 38:  type=float, missing=  8 of 100, average=0.208914, stdev=1.049318, range=[-2.170698,2.969183], active=1
+covariate 39:  type=float, missing=  5 of 100, average=0.011651, stdev=0.943795, range=[-2.677406,1.965571], active=1
+covariate 40:  type=float, missing=  3 of 100, average=-0.049574, stdev=1.010965, range=[-3.184111,3.030658], active=1
+covariate 41:  type=float, missing=  6 of 100, average=0.205625, stdev=0.949820, range=[-2.808491,2.333413], active=1
+covariate 42:  type=float, missing=  8 of 100, average=0.013636, stdev=1.065634, range=[-2.751852,2.614698], active=1
+covariate 43:  type=float, missing=  6 of 100, average=0.049671, stdev=1.108988, range=[-2.116927,3.032130], active=1
+covariate 44:  type=float, missing=  3 of 100, average=-0.212568, stdev=0.926770, range=[-2.229853,2.048888], active=1
+covariate 45:  type=float, missing=  4 of 100, average=-0.026846, stdev=0.921013, range=[-2.391836,2.031770], active=1
+covariate 46:  type=float, missing=  2 of 100, average=0.145110, stdev=1.216097, range=[-4.225883,2.753848], active=1
+covariate 47:  type=float, missing=  3 of 100, average=-0.016757, stdev=1.039420, range=[-2.606483,2.260656], active=1
+covariate 48:  type=float, missing=  6 of 100, average=0.003170, stdev=0.960310, range=[-2.446946,2.670396], active=1
+covariate 49:  type=float, missing=  4 of 100, average=-0.057427, stdev=0.960744, range=[-2.671420,2.346944], active=1
+covariate 50:  type=float, missing=  8 of 100, average=0.026129, stdev=0.900063, range=[-1.869345,2.455641], active=1
+covariate 51:  type=float, missing=  3 of 100, average=0.040183, stdev=0.967139, range=[-2.757947,2.605705], active=1
+covariate 52:  type=float, missing=  4 of 100, average=-0.217417, stdev=0.913159, range=[-2.303444,2.748616], active=1
+covariate 53:  type=float, missing=  4 of 100, average=-0.150865, stdev=1.007125, range=[-2.427665,2.294873], active=1
+covariate 54:  type=float, missing=  6 of 100, average=-0.060514, stdev=0.938159, range=[-2.395766,2.055314], active=1
+covariate 55:  type=float, missing=  7 of 100, average=-0.079012, stdev=0.922375, range=[-2.700065,2.413592], active=1
+covariate 56:  type=float, missing=  7 of 100, average=-0.023018, stdev=0.939467, range=[-2.043441,1.970072], active=1
+covariate 57:  type=float, missing=  9 of 100, average=-0.012259, stdev=1.162612, range=[-3.721842,2.919266], active=1
+covariate 58:  type=float, missing=  1 of 100, average=-0.098537, stdev=0.998580, range=[-2.912216,2.366891], active=1
+covariate 59:  type=float, missing=  4 of 100, average=0.014908, stdev=1.190006, range=[-3.278070,2.626200], active=1
+covariate 60:  type=float, missing=  5 of 100, average=0.003277, stdev=0.954861, range=[-2.644506,2.171412], active=1
+covariate 61:  type=float, missing=  8 of 100, average=-0.115129, stdev=1.025947, range=[-2.708062,2.280763], active=1
+covariate 62:  type=float, missing=  2 of 100, average=-0.013728, stdev=0.961426, range=[-2.412399,2.004851], active=1
+covariate 63:  type=float, missing=  5 of 100, average=-0.072063, stdev=1.140821, range=[-3.459016,2.455169], active=1
+covariate 64:  type=float, missing=  5 of 100, average=0.044570, stdev=0.986133, range=[-2.665205,2.557168], active=1
+covariate 65:  type=float, missing=  3 of 100, average=-0.108974, stdev=0.977082, range=[-2.206319,2.728817], active=1
+covariate 66:  type=float, missing=  6 of 100, average=0.034032, stdev=0.986039, range=[-2.525518,2.376208], active=1
+covariate 67:  type=float, missing=  3 of 100, average=-0.067138, stdev=0.921703, range=[-1.971004,2.638406], active=1
+covariate 68:  type=float, missing=  6 of 100, average=0.076358, stdev=1.043157, range=[-2.584402,2.465630], active=1
+covariate 69:  type=float, missing=  3 of 100, average=0.106907, stdev=0.974906, range=[-2.497363,2.672795], active=1
+covariate 70:  type=float, missing=  2 of 100, average=-0.196220, stdev=1.004908, range=[-2.482409,2.074642], active=1
+covariate 71:  type=float, missing=  9 of 100, average=-0.082284, stdev=1.077681, range=[-2.976458,2.546805], active=1
+covariate 72:  type=float, missing=  8 of 100, average=0.072364, stdev=1.101143, range=[-1.994820,2.532809], active=1
+covariate 73:  type=float, missing=  6 of 100, average=0.080940, stdev=1.021740, range=[-2.713487,2.738737], active=1
+covariate 74:  type=float, missing=  5 of 100, average=-0.112595, stdev=0.992960, range=[-2.568438,2.857256], active=1
+covariate 75:  type=float, missing=  5 of 100, average=-0.021730, stdev=0.942359, range=[-1.757007,2.389453], active=1
+covariate 76:  type=float, missing=  3 of 100, average=0.006803, stdev=1.013647, range=[-2.807985,2.122590], active=1
+covariate 77:  type=float, missing=  7 of 100, average=0.047598, stdev=0.903362, range=[-1.852669,2.365432], active=1
+covariate 78:  type=float, missing=  4 of 100, average=-0.052406, stdev=0.995810, range=[-2.288642,2.584384], active=1
+covariate 79:  type=float, missing=  5 of 100, average=-0.090257, stdev=0.954669, range=[-2.677858,2.319220], active=1
+covariate 80:  type=float, missing=  4 of 100, average=-0.028890, stdev=1.010625, range=[-2.506374,2.237312], active=1

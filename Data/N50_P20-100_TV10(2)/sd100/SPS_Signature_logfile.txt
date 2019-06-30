@@ -14,8 +14,8 @@ covariate selection: error expectation minimisation
 50/50 cross-validation
 nr of training sets per iteration: 200
 HYPERPARAMETER_CONTROL=3
-duration of batch loop: 0.036238 days
-proposed nr of covariates, test data performance: 9
-proposed nr of covariates, avoiding overfitting:  6
+duration of batch loop: 0.036296 days
+proposed nr of covariates, test data performance: 23
+proposed nr of covariates, avoiding overfitting:  7
 calculating error bars ...
 returning allocated memory ...
