@@ -7,7 +7,8 @@ library(caret)
 library(readr)
 library(openxlsx)
 
-
+p_number<-40
+n<-
 a<-1
 excelpath<-"~/GitHub/mscproject/Data/RSF_results.xlsx"
 wb<-createWorkbook()
@@ -205,7 +206,7 @@ strCol <- c("TRUE" = "red",
   t2<- rfsrc_test$time.interest[m2]  
   #
   # Get the ground truth as a vector of who did survive beyond t
-  truth <- data_train$time >t2
+  truth <- data_train$time >t
   if(length(censored_before)!=0){
     truth <- data_train$time[-censored_before] > t
     }

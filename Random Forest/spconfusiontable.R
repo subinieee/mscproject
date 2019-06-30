@@ -13,13 +13,13 @@ addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
 addWorksheet(wb, "TV_N")
 saveWorkbook(wb,excelpath, overwrite = TRUE)
-
+/Users/subinieee/GitHub/mscproject/Data/N10_P20-100_TV10(1)/sd20/SETCV_L2/active_covariates.txt
 for (j in c(1:3)){
 N<-N_arr[j]
 for (i in c(1:5)){
-datasrc_train<-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10/sd",P[i],"/SETCV_L2/confusion_table.txt")
-datasrc_test<-paste0("~/GitHub/mscproject/Data/test data/confusion table_test/confusion_table_n",N,"_p",P[i],"_tv",TV,"_test.txt")
-act_CoV<-read.csv(paste0("/Users/subinieee/GitHub/mscproject/Data/N",N,"_P20-100_TV10/sd",P[i],"/SETCV_L2/active_covariates.txt"),sep = "",header = FALSE)
+datasrc_train<-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")/sd",P[i],"/SETCV_L2/confusion_table.txt")
+datasrc_test<-paste0("~/GitHub/mscproject/Data/test data/confusion table_test/confusion_table_n",N,"_p",P[i],"_tv10(",nrdata,")_test.txt")
+act_CoV<-read.csv(paste0("/Users/subinieee/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")/sd",P[i],"/SETCV_L2/active_covariates.txt"),sep = "",header = FALSE)
 act_CoV<-paste(act_CoV[(nrow(act_CoV)-(TV-1)),(2:(TV+1))])
 CoV_count<-length(which(as.numeric(act_CoV[1:TV])<=10))
 Sensitivity<-length(which(as.numeric(act_CoV[1:TV])<=10))/TV
