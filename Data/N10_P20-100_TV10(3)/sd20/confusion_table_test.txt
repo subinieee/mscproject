@@ -1,0 +1,2 @@
+true class 0    (32%):  class 0: 20/25  class 1: 5/25  
+true class 1    (68%):  class 0: 20/52  class 1: 32/52  

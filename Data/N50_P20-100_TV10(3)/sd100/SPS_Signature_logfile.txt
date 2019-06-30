@@ -1,0 +1,17 @@
+Thu Jun 27 09:52:27 2019
+reading SD100.dat
+normalizing data ...
+batch multivariate regression ...
+prediction performance quantified by counting errors
+cutoff time: 1.718643
+regulariser: L=2
+preselection of covariates: rank correlation with outcome
+covariate selection: error expectation minimisation
+50/50 cross-validation
+nr of training sets per iteration: 200
+HYPERPARAMETER_CONTROL=3
+duration of batch loop: 0.034931 days
+proposed nr of covariates, test data performance: 31
+proposed nr of covariates, avoiding overfitting:  6
+calculating error bars ...
+returning allocated memory ...

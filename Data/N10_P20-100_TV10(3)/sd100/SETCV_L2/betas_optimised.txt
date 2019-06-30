@@ -1,0 +1,2 @@
+covariate14: beta[14]=1.334261(rank=1)
+covariate96: beta[96]=-1.530436(rank=2)
