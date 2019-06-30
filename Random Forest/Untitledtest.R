@@ -28,7 +28,7 @@ datasrc <-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")")
                             stringsAsFactors = FALSE)
     data_train <- data_train[,-1]
   
-    data_test <-read.delim(paste0("~/GitHub/mscproject/Data/test data(",nrtestdata,")/sd",p_number,"_test/SD",p_number,"_test.dat"),
+    data_test <-read.delim(paste0("~/GitHub/mscproject/Data/Test(",nrtestdata,")/sd",p_number,"_test/SD",p_number,".dat"),
                            skip=3, 
                            sep=(" "),
                            nrows=100, 
