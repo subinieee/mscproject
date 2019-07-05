@@ -7,7 +7,6 @@ nrtestdata<-2
 nrdata<-1
 
 
-
 excelpath<-"~/GitHub/mscproject/Data/SP_results.xlsx"
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
