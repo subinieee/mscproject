@@ -1,8 +1,4 @@
-Mon Jun 24 17:32:22 2019
-   generating synthetic survival data
-normalizing data ...
-   N=100, P=100, risk=1
-returning allocated memory ...
+Mon Jul  1 13:03:47 2019
 reading SD100.dat
 normalizing data ...
 batch multivariate regression ...
@@ -14,8 +10,8 @@ covariate selection: error expectation minimisation
 50/50 cross-validation
 nr of training sets per iteration: 200
 HYPERPARAMETER_CONTROL=3
-duration of batch loop: 0.030035 days
-proposed nr of covariates, test data performance: 18
+duration of batch loop: 0.030486 days
+proposed nr of covariates, test data performance: 21
 proposed nr of covariates, avoiding overfitting:  7
 calculating error bars ...
 returning allocated memory ...
