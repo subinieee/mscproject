@@ -7,23 +7,22 @@ library(caret)
 library(readr)
 library(openxlsx)
 
-p_number<-40
-n<-
+
 a<-1
-excelpath<-"~/GitHub/mscproject/Data/RSF_results.xlsx"
+excelpath<-"~/GitHub/mscproject/Data/RSF_results_N100.xlsx"
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
 addWorksheet(wb, "TV_N")
 saveWorkbook(wb,excelpath, overwrite = FALSE)
 
-nrdata<-1
-nrtestdata<-2
+nrdata<-2
+nrtestdata<-1
 TV <-10
-N_arr<-c(10,50,100)
+N_arr<-c(100)
 P<-c(20,40,60,80,100)
 
-for (k in c(1:3)){N<<-N_arr[k]
+for (k in c(1:length(N_arr))){N<<-N_arr[k]
 datasrc <-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")")
 #Function for repeating RF with different datasets on a loop.
 rfsrc_in_loop <- function(p_number){
@@ -42,7 +41,7 @@ rfsrc_in_loop <- function(p_number){
                      header = FALSE, 
                      stringsAsFactors = FALSE)
   data_train <- data_train[,-1]
-  data_test <-read.delim(paste0("~/GitHub/mscproject/Data/test data(",nrtestdata,")/sd",p_number,"_test/SD",p_number,".dat"),
+  data_test <-read.delim(paste0("~/GitHub/mscproject/Data/Test(",nrtestdata,")/sd",p_number,"_test/SD",p_number,".dat"),
                          skip=3, 
                          sep=(" "),
                          nrows=100, 
@@ -59,6 +58,8 @@ rfsrc_in_loop <- function(p_number){
   data_train$event <-as.numeric(data_train$event)
   #
   censored_before<-which(data_train$time[which(data_train$event==0)]<median(data_train$time))
+  censored_before2<-which(data_test$time[which(data_test$event==0)]<median(data_test$time))
+  
   #
   data_train$event <-as.numeric(data_train$event)
   col_names <-list(1:ncol(data_test))
@@ -217,7 +218,10 @@ strCol <- c("TRUE" = "red",
   if(length(censored_before)!=0){
     pred_train <-pred_train[-censored_before]
   }
-  pred_test <- rfsrc_test$survival[,m] >0.5 #rfsrc_train$survival.oob[,m] >0.5
+  pred_test <- rfsrc_test$survival[,m2] >0.5 #rfsrc_train$survival.oob[,m] >0.5
+  if(length(censored_before2)!=0){
+    pred_train <-pred_train[-censored_before2]
+  }
   # Confusion matrix
   cm_train <- matrix(c(length(which(truth=="FALSE" & pred_train=="FALSE")),length(which(truth=="FALSE" & pred_train=="TRUE")),
                  length(which(truth=="TRUE" & pred_train=="FALSE")),length(which(truth=="TRUE" & pred_train=="TRUE"))),
@@ -234,8 +238,8 @@ strCol <- c("TRUE" = "red",
   cm_test <- as.table(cm_test)
   
   # Accuracy  
-  accuracy_train <- (cm_train[1,1] + cm_train[2,2])/sum(cm_train)
-  accuracy_test <-(cm_test[1,1] + cm_test[2,2])/sum(cm_test)
+  accuracy_train <<- (cm_train[1,1] + cm_train[2,2])/sum(cm_train)
+  accuracy_test <<-(cm_test[1,1] + cm_test[2,2])/sum(cm_test)
   #collect data in an array(replace 'a'th number in the array after each loop)
   Err_train[a]<<- accuracy_train
   Err_test[a]<<- accuracy_test
@@ -267,7 +271,7 @@ strCol <- c("TRUE" = "red",
   a<<-1
 }
 # Run rfsrc for different datasets on the loop 
-for (i in c(1:5)){rfsrc_in_loop(P[i])}
+for (i in c(1:length(P))){rfsrc_in_loop(P[i])}
 }
 
 
@@ -285,8 +289,9 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
         axis.title.x = element_text(size=14, face="bold"),
         axis.title.y = element_text(size=14, face="bold"))+
   scale_x_continuous(trans = 'log2') +
-  ylim(NA,1)
-ggsave(paste0("RSF predacc_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+  ylim(0,1)
+
+ggsave(paste0("RSF predacc_p_n_N100.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
 Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('test','train'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
@@ -297,8 +302,8 @@ ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
         axis.title.x = element_text(size=14, face="bold"),
         axis.title.y = element_text(size=14, face="bold"))+
   scale_x_continuous(trans = 'log2') +
-  ylim(NA,1)
-ggsave(paste0("RSF predacc_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+  ylim(0,1)
+ggsave(paste0("RSF predacc_TV_P_N100.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
 Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('precision_var'))
 ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) + 
@@ -311,8 +316,8 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
         axis.title.x = element_text(size=14, face="bold"),
         axis.title.y = element_text(size=14, face="bold"))+
   scale_x_continuous(trans = 'log2') +
-  ylim(NA,1)
-  ggsave(paste0("RSF select_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+  ylim(0,1)
+  ggsave(paste0("RSF select_p_n_N100.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
 Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('precision_var'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
@@ -326,5 +331,5 @@ ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
         axis.title.y = element_text(size=14, face="bold"))+
   scale_x_continuous(trans = 'log2') +
   ylim(NA,1)
-ggsave(paste0("RSF select_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+ggsave(paste0("RSF select_TV_P_N100.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
