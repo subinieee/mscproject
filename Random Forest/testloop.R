@@ -12,8 +12,8 @@ library(Amelia)
 library(plyr)
 
 #data structuring
-data2<-read.csv("~/Desktop/data2.txt", stringsAsFactors = TRUE)
-data_train <-read.csv("~/Desktop/patient_dat.txt", stringsAsFactors = TRUE)
+data2<-read.csv("~/Desktop/COIN/data2.txt", stringsAsFactors = TRUE)
+data_train <-read.csv("~/Desktop/COIN/patient_dat.txt", stringsAsFactors = TRUE)
 # exclude unrelated columns
 data_train <-data_train[,(1:which(names(data_train)=='FRET'))]
 data2 <- data2[,-1]
@@ -24,16 +24,16 @@ data_train<-data_train[,-c(60:63,1)]
 
 summary(data2)
 missmap(data2)
-colSums(is.na(data_train))
-data2<-data2[-which(colSums(!is.na(data2))/1630<0.20)]
+colSums(is.na(data_train))/1630
+data2<-data2[-which(colSums(is.na(data2))/1630>0.20)]
 
-data_train_os<-(cbind(data2,outcome_os))
+data_train_pfs<-(cbind(data2,outcome_pfs))
 
-colnames(data_train_os)[length(colnames(data_train_os))-1] <- "time"
-data_train_os$time <-data_train_os$time/365
-colnames(data_train_os)[length(colnames(data_train_os))] <- "event"
-data_train_os$event <-as.numeric(data_train_os$event) 
-censored_before<-which(data_train_os$time[which(data_train_os$event==0)]<median(data_train_os$time))
+colnames(data_train_pfs)[length(colnames(data_train_pfs))-1] <- "time"
+data_train_pfs$time <-data_train_pfs$time/365
+colnames(data_train_pfs)[length(colnames(data_train_pfs))] <- "event"
+data_train_pfs$event <-as.numeric(data_train_pfs$event) 
+censored_before<-which(data_train_pfs$time[which(data_train_pfs$event==0)]<median(data_train_pfs$time))
 
 df<-cbind("no.covariates"=0,"accuracy_train"=0, "accuracy_OOB"=0, "err_rate"=0)
 active_covariates<-list(0)
@@ -41,14 +41,14 @@ active_covariates<-list(0)
 for(i in c(1:length(colnames(data2)))){
   
   set.seed(1)
-  #data_train_os<-data_train_os %>% mutate_if(sapply(data_train_os, is.character), as.factor)
-  #sapply(data_train_os, class)
+  #data_train_pfs<-data_train_pfs %>% mutate_if(sapply(data_train_pfs, is.character), as.factor)
+  #sapply(data_train_pfs, class)
   #train set train (default nodesize is 15 for survival family - the paper used 3)
   rfsrc_train <- rfsrc(Surv(time,event) ~ .,
                        ntree = 1000,
                        #nodesize = 6,
                        #mtry=32,
-                       data=data_train_os,
+                       data=data_train_pfs,
                        nsplit=10, 
                        na.action="na.impute",
                        tree.err=TRUE, 
@@ -63,14 +63,14 @@ for(i in c(1:length(colnames(data2)))){
   
   #Prediction Accuracy 
   #find cut-off time(median survival time)
-  t<- median(data_train_os$time)
+  t<- median(data_train_pfs$time)
   m <- which.min(abs(rfsrc_train$time.interest - t))
   t<- rfsrc_train$time.interest[m]  
   #
   # Get the ground truth as a vector of who did survive beyond t
-  truth <- data_train_os$time >t
+  truth <- data_train_pfs$time >t
   if(length(censored_before)!=0){
-    truth <- data_train_os$time[-censored_before] > t
+    truth <- data_train_pfs$time[-censored_before] > t
   }
   
   #
@@ -102,8 +102,8 @@ for(i in c(1:length(colnames(data2)))){
   accuracy_OOB <- (cm_OOB[1,1] + cm_OOB[2,2])/sum(cm_OOB)
   #create dataframes and combine with old data
   active_covariates <-c(active_covariates,list(vimp$vars))
-  df<-rbind(df,cbind("no.covariates"=length(colnames(data_train_os))-2,accuracy_train,accuracy_OOB, "C-Index"=1-rfsrc_train$err.rate[1000]))
-  data_train_os<-data_train_os[-which(names(data_train_os)==vimp$vars[length(vimp$vars)])]
+  df<-rbind(df,cbind("no.covariates"=length(colnames(data_train_pfs))-2,accuracy_train,accuracy_OOB, "C-Index"=1-rfsrc_train$err.rate[1000]))
+  data_train_pfs<-data_train_pfs[-which(names(data_train_pfs)==vimp$vars[length(vimp$vars)])]
   
 }
 
@@ -115,7 +115,7 @@ df<-df[-1,]
 active_covariates<-active_covariates[-1]
 aa<-paste0(active_covariates)
 colnames(active_covariates)
-
+colnames(df)[4]<-"C-Index"
 #restructure and aggregate data
 Vis_df <- melt(df, id.vars = c('no.covariates'), measure.vars = c("accuracy_train","accuracy_OOB","C-Index"))
 

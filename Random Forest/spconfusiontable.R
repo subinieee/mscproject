@@ -7,7 +7,7 @@ nrtestdata<-2
 nrdata<-1
 
 
-excelpath<-"~/GitHub/mscproject/Data/SP_results.xlsx"
+excelpath<-"~/GitHub/mscproject/Data/EOT/SP_results_N10.xlsx"
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
@@ -16,9 +16,9 @@ saveWorkbook(wb,excelpath, overwrite = FALSE)
 for (j in c(1:3)){
 N<-N_arr[j]
 for (i in c(1:5)){P<-P_arr[i]
-datasrc_train<-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/confusion_table.txt")
-datasrc_test<-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")/Test(",nrtestdata,")/sd",P,"_test/confusion_table_test.txt")
-act_CoV<-read.csv(paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/active_covariates.txt"),sep = "",header = FALSE)
+datasrc_train<-paste0("~/GitHub/mscproject/Data/EOT/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/confusion_table.txt")
+datasrc_test<-paste0("~/GitHub/mscproject/Data/EOT/N",N,"_P20-100_TV10(",nrdata,")/Test(",nrtestdata,")/sd",P,"_test/confusion_table_test.txt")
+act_CoV<-read.csv(paste0("~/GitHub/mscproject/Data/EOT/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/active_covariates.txt"),sep = "",header = FALSE)
 act_CoV<-paste(act_CoV[(nrow(act_CoV)-(TV-1)),(2:(TV+1))])
 CoV_count<-length(which(as.numeric(act_CoV[1:TV])<=10))
 precision_<-length(which(as.numeric(act_CoV[1:TV])<=10))/TV
