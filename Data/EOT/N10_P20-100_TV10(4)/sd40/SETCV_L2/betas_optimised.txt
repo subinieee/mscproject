@@ -1,0 +1,1 @@
+covariate25: beta[25]=-1.013566(rank=1)

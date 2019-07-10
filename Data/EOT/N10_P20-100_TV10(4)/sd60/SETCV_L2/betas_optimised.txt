@@ -1,0 +1,1 @@
+covariate41: beta[41]=1.281598(rank=1)

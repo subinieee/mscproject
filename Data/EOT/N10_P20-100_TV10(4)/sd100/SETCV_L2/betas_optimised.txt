@@ -1,0 +1,2 @@
+covariate33: beta[33]=-1.063484(rank=2)
+covariate75: beta[75]=0.591375(rank=1)

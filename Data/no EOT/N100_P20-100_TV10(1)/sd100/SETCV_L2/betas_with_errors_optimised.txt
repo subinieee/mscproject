@@ -1,0 +1,8 @@
+covariate1: beta[1]=0.471506 pm 0.123439 (rank=4), z-score=3.819764, p-value=0.000134, HR=2.567705 HR=[1.582702,4.165731] (95% CI)
+covariate2: beta[2]=0.524475 pm 0.130164 (rank=7), z-score=4.029327, p-value=0.000056, HR=2.854651 HR=[1.713787,4.754986] (95% CI)
+covariate4: beta[4]=0.722585 pm 0.137859 (rank=6), z-score=5.241499, p-value=0.000000, HR=4.242576 HR=[2.471352,7.283242] (95% CI)
+covariate5: beta[5]=0.549677 pm 0.118666 (rank=5), z-score=4.632127, p-value=0.000004, HR=3.002223 HR=[1.885479,4.780400] (95% CI)
+covariate6: beta[6]=-0.474348 pm 0.122315 (rank=3), z-score=3.878084, p-value=0.000105, HR=0.387246 HR=[0.239747,0.625489] (95% CI)
+covariate7: beta[7]=-0.448677 pm 0.115647 (rank=8), z-score=3.879709, p-value=0.000105, HR=0.407647 HR=[0.259062,0.641454] (95% CI)
+covariate8: beta[8]=-0.818280 pm 0.135373 (rank=1), z-score=6.044643, p-value=0.000000, HR=0.194648 HR=[0.114495,0.330913] (95% CI)
+covariate9: beta[9]=-0.464766 pm 0.116970 (rank=2), z-score=3.973387, p-value=0.000071, HR=0.394738 HR=[0.249561,0.624371] (95% CI)
