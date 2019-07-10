@@ -1,2 +1,0 @@
-covariate6: beta[6]=1.199162(rank=1)
-covariate68: beta[68]=1.373011(rank=2)

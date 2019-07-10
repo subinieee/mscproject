@@ -1,2 +1,0 @@
-covariate43: beta[43]=1.076937(rank=2)
-covariate44: beta[44]=1.417572(rank=1)
