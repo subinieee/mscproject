@@ -26,7 +26,7 @@ summary(data2)
 missmap(data2)
 colSums(is.na(data_train))/1630
 data2<-data2[-which(colSums(is.na(data2))/1630>0.20)]
-
+missmap(data2)
 data_train_pfs<-(cbind(data2,outcome_pfs))
 
 colnames(data_train_pfs)[length(colnames(data_train_pfs))-1] <- "time"
@@ -60,7 +60,7 @@ for(i in c(1:length(colnames(data2)))){
   
   # variable importance(lbls=st.labs needs to be defined)
   vimp<-gg_vimp(rfsrc_train)
-  
+  print(vimp)
   #Prediction Accuracy 
   #find cut-off time(median survival time)
   t<- median(data_train_pfs$time)
