@@ -3,7 +3,7 @@
                     Was data imputed: yes
                      Number of trees: 1000
            Forest terminal node size: 3
-       Average no. of terminal nodes: 23.08
+       Average no. of terminal nodes: 23.227
 No. of variables tried at each split: 8
               Total no. of variables: 60
        Resampling used to grow trees: swor
@@ -12,5 +12,5 @@ No. of variables tried at each split: 8
                               Family: surv
                       Splitting rule: logrank *random*
        Number of random split points: 10
-                          Error rate: 33.34%
+                          Error rate: 32.76%
 
