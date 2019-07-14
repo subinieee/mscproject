@@ -9,14 +9,14 @@ library(openxlsx)
 
 
 a<-1
-excelpath<-"~/GitHub/mscproject/Data/RSF_results_N100.xlsx"
+excelpath<-"~/GitHub/mscproject/Data/no EOT/N50_P20-100_TV10(1)/"
+
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
-addWorksheet(wb, "TV_N")
 saveWorkbook(wb,excelpath, overwrite = FALSE)
 
-nrdata<-2
+nrdata<-1
 nrtestdata<-1
 TV <-10
 N_arr<-c(100)
@@ -68,6 +68,7 @@ rfsrc_in_loop <- function(p_number){
   colnames(data_test)[length(colnames(data_test))-1] <- "time"
   colnames(data_test)[length(colnames(data_test))] <- "event"
   data_test$event <-as.numeric(data_test$event)
+
 # Create the gg_survival object
   gg_dta <- gg_survival(interval="time",
                       censor="event",
@@ -168,8 +169,6 @@ strCol <- c("TRUE" = "red",
     labs(y="survival Probability",
          x="Time(years)")+
     coord_cartesian(ylim=c(-0.01,1.01))
-  show(ggRFsrc)
-
    ggsave("rfsrc_train.png", plot=last_plot(),path=savepath)
 
 # variable importance(lbls=st.labs needs to be defined)
@@ -193,11 +192,12 @@ strCol <- c("TRUE" = "red",
 
   plot(gg_md)
   ggsave(paste0("top_variables(",j,").png"), plot=last_plot(),path=savepath)
+
 #test set predictions
 
   
 #Prediction Accuracy 
-  #find cut-off time(median survival time)
+#find cut-off time(median survival time)
   t<- median(data_train$time)
   m <- which.min(abs(rfsrc_train$time.interest - t))
   t<- rfsrc_train$time.interest[m]  
@@ -256,8 +256,6 @@ strCol <- c("TRUE" = "red",
   df1<<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
   df2<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, seed=c(1:3),TV_P=TV/P[i], test=Err_test, train=Err_train,precision_var=precision_var, stringsAsFactors=FALSE)
   df2<<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
-  df3<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, seed=c(1:3),TV_N=TV/N_arr[k], test=Err_test, train=Err_train, precision_var=precision_var, stringsAsFactors=FALSE)
-  df3<<-rbind(read.xlsx(excelpath, sheet="TV_N"), df3)
   
   #push combined data to a new excel file. 
   wb<-createWorkbook()
@@ -265,8 +263,6 @@ strCol <- c("TRUE" = "red",
   writeData(wb,sheet="P_N",df1)
   addWorksheet(wb, "TV_P")
   writeData(wb,sheet="TV_P",df2)
-  addWorksheet(wb, "TV_N")
-  writeData(wb,sheet="TV_N",df3)
   saveWorkbook(wb,excelpath, overwrite = TRUE)
   a<<-1
 }
@@ -291,7 +287,7 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
   scale_x_continuous(trans = 'log2') +
   ylim(0,1)
 
-ggsave(paste0("RSF predacc_p_n_N100.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+ggsave(paste0("RSF predacc_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/no EOT/")
 
 Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('test','train'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
@@ -303,7 +299,7 @@ ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
         axis.title.y = element_text(size=14, face="bold"))+
   scale_x_continuous(trans = 'log2') +
   ylim(0,1)
-ggsave(paste0("RSF predacc_TV_P_N100.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+ggsave(paste0("RSF predacc_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/no EOT/")
 
 Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('precision_var'))
 ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) + 
@@ -317,7 +313,7 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
         axis.title.y = element_text(size=14, face="bold"))+
   scale_x_continuous(trans = 'log2') +
   ylim(0,1)
-  ggsave(paste0("RSF select_p_n_N100.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+  ggsave(paste0("RSF select_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/no EOT/")
 
 Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('precision_var'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
@@ -331,5 +327,5 @@ ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
         axis.title.y = element_text(size=14, face="bold"))+
   scale_x_continuous(trans = 'log2') +
   ylim(NA,1)
-ggsave(paste0("RSF select_TV_P_N100.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
+ggsave(paste0("RSF select_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/no EOT/")
 
