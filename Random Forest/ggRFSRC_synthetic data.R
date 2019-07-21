@@ -16,11 +16,11 @@ addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
 saveWorkbook(wb,excelpath, overwrite = FALSE)
 
-nrdata<-1
-nrtestdata<-1
+nrdata<-3
+nrtestdata<-2
 TV <-10
-N_arr<-c(100)
-P<-c(20,40,60,100)
+N_arr<-c(50)
+P<-c(20,40,60,80,100)
 
 for (k in c(1:length(N_arr))){N<<-N_arr[k]
 datasrc <-paste0("~/GitHub/mscproject/Data/EOT/N",N,"_P20-100_TV10(",nrdata,")")
@@ -256,9 +256,9 @@ strCol <- c("TRUE" = "red",
   #collect average accuary values of the model at different P values
   #create dataframes and combine with old data
   
-  df1<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, seed=c(1:10),p_n=P[i]/N_arr[k], test=Err_test, train=Err_train, 'precision_var'=Variable_selection, 'C-Index'=cindex, stringsAsFactors=FALSE)
+  df1<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, p_n=P[i]/N_arr[k], test=mean(Err_test), train=mean(Err_train), 'precision_var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
   df1<<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
-  df2<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, seed=c(1:10),TV_P=TV/P[i], test=Err_test, train=Err_train,'precision_var'=Variable_selection, 'C-Index'=cindex, stringsAsFactors=FALSE)
+  df2<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata,TV_P=TV/P[i], test=mean(Err_test), train=mean(Err_train),'precision_var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
   df2<<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
   
   #push combined data to a new excel file. 
