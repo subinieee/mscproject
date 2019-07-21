@@ -1,0 +1,2 @@
+covariate1: beta[1]=0.455037(rank=1)
+covariate18: beta[18]=-0.157157(rank=2)
