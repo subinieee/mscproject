@@ -1,4 +1,8 @@
-Wed Jul 17 09:28:19 2019
+Tue Jul 23 14:28:12 2019
+   generating synthetic survival data
+normalizing data ...
+   N=50, P=40, risk=1
+returning allocated memory ...
    generating synthetic survival data
 normalizing data ...
    N=100, P=40, risk=1
