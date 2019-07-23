@@ -1,4 +1,4 @@
-Mon Jul 15 16:07:36 2019
+Tue Jul 23 01:25:20 2019
    generating synthetic survival data
 normalizing data ...
    N=50, P=80, risk=1
@@ -7,15 +7,15 @@ reading SD80.dat
 normalizing data ...
 batch multivariate regression ...
 prediction performance quantified by counting errors
-cutoff time: 2.210357
+cutoff time: 3.273736
 regulariser: L=2
 preselection of covariates: rank correlation with outcome
 covariate selection: error expectation minimisation
 50/50 cross-validation
 nr of training sets per iteration: 200
 HYPERPARAMETER_CONTROL=3
-duration of batch loop: 0.012627 days
-proposed nr of covariates, test data performance: 16
-proposed nr of covariates, avoiding overfitting:  8
+duration of batch loop: 0.012593 days
+proposed nr of covariates, test data performance: 25
+proposed nr of covariates, avoiding overfitting:  6
 calculating error bars ...
 returning allocated memory ...
