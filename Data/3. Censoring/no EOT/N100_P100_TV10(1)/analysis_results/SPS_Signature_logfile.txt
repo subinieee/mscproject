@@ -1,0 +1,7 @@
+Wed Jul 24 17:40:10 2019
+reading SD1000.dat
+cannot open file
+reading SD10.dat
+cannot open file
+reading SD100.dat
+normalizing data ...

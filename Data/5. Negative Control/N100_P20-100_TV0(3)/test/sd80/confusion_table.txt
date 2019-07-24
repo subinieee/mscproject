@@ -1,0 +1,3 @@
+true class 0    (45%):  class 0: 21/45  class 1: 24/45  
+true class 1    (55%):  class 0: 32/55  class 1: 23/55  
+early censoring (0%):  class 0: 0/0  class 1: 0/0  
