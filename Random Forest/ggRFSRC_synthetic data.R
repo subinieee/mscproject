@@ -9,30 +9,34 @@ library(openxlsx)
 library(reshape2)
 
 a<-1 
-excelpath<-"~/GitHub/mscproject/Data/EOT/RSF.xlsx"
+study<- c('1. Dimension','2. Noise','3. Censoring','4. Missing data','5. Negative Control')
+excelpath<-paste0("~/GitHub/mscproject/Data/RSF_",study[1],".xlsx")
 
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
 saveWorkbook(wb,excelpath, overwrite = FALSE)
 
-nrdata<-3
+nrdata<-1
 nrtestdata<-2
 TV <-10
-N_arr<-c(50)
-P<-c(20,40,60,80,100)
+N_arr<-c(100)
+P<-c(100)
 
 for (k in c(1:length(N_arr))){N<<-N_arr[k]
-datasrc <-paste0("~/GitHub/mscproject/Data/EOT/N",N,"_P20-100_TV10(",nrdata,")")
+
+datasrc <-paste0("~/GitHub/mscproject/Data/",study[1],"/N",N,"_P20-100_TV10(",nrdata,")")
+datasrc2 <-paste0("~/GitHub/mscproject/Data/",study[1],"/N",N,"_P20-100_TV10(",nrtestdata,")")
+
 #Function for repeating RF with different datasets on a loop.
 rfsrc_in_loop <- function(p_number){
-  Err_train <<-c(1:10)
-  Err_test <<-c(1:10)
-  Variable_selection <<-c(1:10)
-  cindex <<-c(1:10) 
+  Err_train <<-c(1:3)
+  Err_test <<-c(1:3)
+  Variable_selection <<-c(1:3)
+  cindex <<-c(1:3) 
 
   savepath<<-paste0("",datasrc,"/RSF",p_number,"")
-  for (j in c(1:10)){
+  for (j in c(1:3)){
 # Data cleaning (read .dat file and remove index column)
   set.seed(j)
   data_train <-read.delim(paste0("",datasrc,"/sd",p_number,"/SD",p_number,".dat"), 
@@ -42,10 +46,10 @@ rfsrc_in_loop <- function(p_number){
                      header = FALSE, 
                      stringsAsFactors = FALSE)
   data_train <- data_train[,-1]
-  data_test <-read.delim(paste0("~/GitHub/mscproject/Data/EOT/Test(",nrtestdata,")/sd",p_number,"_test/SD",p_number,".dat"),
+  data_test <-read.delim(paste0("",datasrc2,"/sd",p_number,"/SD",p_number,".dat"),
                          skip=3, 
                          sep=(" "),
-                         nrows=100, 
+                         nrows=N, 
                          header = FALSE, 
                          stringsAsFactors = FALSE)
   data_test <- data_test[,-1]
@@ -60,7 +64,6 @@ rfsrc_in_loop <- function(p_number){
   data_train<<-data_train
   
   #
-  data_train$event <-as.numeric(data_train$event)
   col_names <-list(1:ncol(data_test))
   col_names <-paste0("","A",col_names[[1]],"")
   colnames(data_test) <-col_names
@@ -111,9 +114,9 @@ rfsrc_in_loop <- function(p_number){
                        data=data_train,
                        nsplit=10, 
                        na.action="na.impute",
-                       tree.err=TRUE, 
+                       tree.err=TRUE,
                        importance=TRUE)
- capture.output(summary(rfsrc_train),file=paste0("",savepath,"/summary_train.txt",""))
+  capture.output(summary(rfsrc_train),file=paste0("",savepath,"/summary_train.txt",""))
   print(rfsrc_train)
   capture.output(print(rfsrc_train),file=paste0("",savepath,"/print_train.txt",""))  
 # would it be more accurate to measure the prediction accuracy by running the model with entire train data set?  
@@ -133,15 +136,27 @@ rfsrc_in_loop <- function(p_number){
   capture.output(summary(rfsrc_test),file=paste0("",savepath,"/summary_test.txt",""))
   print(rfsrc_test)
   capture.output(print(rfsrc_test),file=paste0("",savepath,"/print_test.txt",""))
+ 
+   # variable importance(lbls=st.labs needs to be defined)
+  vimp<-gg_vimp(rfsrc_train)
+  vimp<-gsub("A", "", vimp$vars)
+  vimp_count<-length(which(as.numeric(vimp[1:TV])<=TV))
+  precision_var<<-length(which(as.numeric(vimp[1:TV])<=TV))/TV
   
-#save survival prediction data
-if(j==1){
-  wb2<-createWorkbook()
-  addWorksheet(wb2, "Train_Survival")
-  addWorksheet(wb2, "Train_Survival.oob")
-  addWorksheet(wb2, "Train_CV_Survival")
-  addWorksheet(wb2, "Test_Survival")
-  saveWorkbook(wb2,paste0("",savepath,"/RSF_resultsDB.xlsx",""), overwrite = TRUE)}
+  plot(gg_vimp(nvar = P[i], rfsrc_train))+
+    theme(legend.position=c(p=0.8,0.2))+
+    labs(fill="VIMP > 0")
+  capture.output(print(vimp), file=paste0(savepath,"/vimp(",j,").txt",""))
+  ggsave(paste0("vimp(",j,").png"), plot=last_plot(),path=savepath)
+
+  #save survival prediction data
+  if(j==1){
+    wb2<-createWorkbook()
+    addWorksheet(wb2, "Train_Survival")
+    addWorksheet(wb2, "Train_Survival.oob")
+    addWorksheet(wb2, "Train_CV_Survival")
+    addWorksheet(wb2, "Test_Survival")
+    saveWorkbook(wb2,paste0("",savepath,"/RSF_resultsDB.xlsx",""), overwrite = TRUE)}
   
   survivalDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"),seed=j,rfsrc_train$survival)
   df4<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""),sheet="Train_Survival"), survivalDB)
@@ -165,8 +180,8 @@ if(j==1){
   ggsave("OOB_err.png", plot=last_plot(),path=savepath)
        
 #strCols should be defined "TRUE" for death(event), "FALSE" for censored
-strCol <- c("TRUE" = "red",
-            "FALSE"="blue")
+  strCol <- c("TRUE" = "red",
+              "FALSE"="blue")
 
   ggRFsrc <-plot(gg_rfsrc(rfsrc_train),alpha=0.2)+
     theme(legend.position="none")+
@@ -176,17 +191,7 @@ strCol <- c("TRUE" = "red",
     coord_cartesian(ylim=c(-0.01,1.01))
    ggsave("rfsrc_train.png", plot=last_plot(),path=savepath)
 
-# variable importance(lbls=st.labs needs to be defined)
-  vimp<-gg_vimp(nvar = P[i], rfsrc_train)
-  vimp<-gsub("A", "", vimp$vars)
-  vimp_count<-length(which(as.numeric(vimp[1:TV])<=10))
-  precision_var<-length(which(as.numeric(vimp[1:TV])<=10))/TV
 
-  plot(gg_vimp(nvar = P[i], rfsrc_train))+
-    theme(legend.position=c(p=0.8,0.2))+
-   labs(fill="VIMP > 0")
-  capture.output(print(vimp), file=paste0(savepath,"/vimp(",j,").txt",""))
-  ggsave(paste0("vimp(",j,").png"), plot=last_plot(),path=savepath)
 
 # minimal depth - nodesize different, threshold different
 
@@ -246,8 +251,8 @@ strCol <- c("TRUE" = "red",
   #collect data in an array(replace 'a'th number in the array after each loop)
   Err_train[a]<<- accuracy_train
   Err_test[a]<<- accuracy_test
-  Variable_selection[a]<<-precision_var
-  cindex[a] <<- 1-rfsrc_train$err.rate[1000]
+  Variable_selection[a]<<- precision_var
+  cindex[a] <<- 1-rfsrc_test$err.rate[1000]
 
   a <<- a+1
   p_number<<-p_number
@@ -256,9 +261,9 @@ strCol <- c("TRUE" = "red",
   #collect average accuary values of the model at different P values
   #create dataframes and combine with old data
   
-  df1<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata, p_n=P[i]/N_arr[k], test=mean(Err_test), train=mean(Err_train), 'precision_var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
+  df1<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV",TV,"(",nrdata,")"), testdata=nrtestdata, p_n=P[i]/N_arr[k], test=mean(Err_test), train=mean(Err_train), 'precision.var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
   df1<<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
-  df2<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"), testdata=nrtestdata,TV_P=TV/P[i], test=mean(Err_test), train=mean(Err_train),'precision_var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
+  df2<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV",TV,"(",nrdata,")"), testdata=nrtestdata,TV_P=TV/P[i], test=mean(Err_test), train=mean(Err_train),'precision.var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
   df2<<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
   
   #push combined data to a new excel file. 
@@ -291,7 +296,7 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
   scale_x_continuous(trans = 'log2') +
   ylim(0,1)
 
-ggsave(paste0("RSF predacc_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/EOT/")
+ggsave(paste0("RSF predacc_p_n_N50.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/1. Dimension/")
 
 Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('test','train','C.Index'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
@@ -305,7 +310,7 @@ ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
   ylim(0,1)
 ggsave(paste0("RSF predacc_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/EOT/")
 
-Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('precision_var'))
+Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('precision.var'))
 ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) + 
   geom_point(aes(shape=variable),size = 3) +
   scale_colour_manual(values=cbPalette)+
@@ -319,7 +324,7 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
   ylim(0,1)
   ggsave(paste0("RSF select_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/EOT/")
 
-Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('precision_var'))
+Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('precision.var'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
   geom_point(aes(shape=variable),size = 3) +
   scale_colour_manual(values=cbPalette)+
