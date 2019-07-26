@@ -1,3 +1,0 @@
-true class 0    (50%):  class 0: 40/50  class 1: 10/50  
-true class 1    (50%):  class 0: 10/50  class 1: 40/50  
-early censoring (0%):  class 0: 0/0  class 1: 0/0  

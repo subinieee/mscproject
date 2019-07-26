@@ -1,8 +1,0 @@
-multivariate risk score formula:
-
-S=(-0.301861274451)*covariate2
-+ (-0.427025244473)*covariate13
-+ (0.177832021385)*covariate42
-+ (-0.211600078866)*covariate63
-- (0.052716189147)
-
