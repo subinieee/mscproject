@@ -1,0 +1,4 @@
+covariate21: beta[21]=-0.273492(rank=4)
+covariate30: beta[30]=0.382978(rank=1)
+covariate40: beta[40]=0.315382(rank=2)
+covariate51: beta[51]=0.281861(rank=3)

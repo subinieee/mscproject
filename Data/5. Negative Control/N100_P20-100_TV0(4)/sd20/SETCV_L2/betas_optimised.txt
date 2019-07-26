@@ -1,0 +1,1 @@
+covariate8: beta[8]=-0.115575(rank=1)

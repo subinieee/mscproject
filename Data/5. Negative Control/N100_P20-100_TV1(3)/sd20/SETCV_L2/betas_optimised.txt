@@ -1,0 +1,1 @@
+covariate1: beta[1]=0.680715(rank=1)
