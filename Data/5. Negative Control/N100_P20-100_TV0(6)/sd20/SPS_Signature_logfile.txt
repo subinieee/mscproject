@@ -1,0 +1,4 @@
+Tue Jul 30 14:28:21 2019
+   generating synthetic survival data
+normalizing data ...
+   N=100, P=20, risk=1
