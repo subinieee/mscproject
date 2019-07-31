@@ -1,3 +1,0 @@
-Wed Jul 24 17:41:45 2019
-reading SD100.dat
-normalizing data ...

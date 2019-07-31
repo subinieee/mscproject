@@ -1,5 +1,0 @@
-Wed Jul 24 17:21:35 2019
-reading 1.dat
-cannot open file
-reading SD100.dat
-normalizing data ...
