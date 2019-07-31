@@ -10,23 +10,23 @@ library(reshape2)
 
 a<-1 
 study<- c('1. Dimension','2. Noise','3. Censoring','4. Missing data','5. Negative Control')
-excelpath<-paste0("~/GitHub/mscproject/Data/RSF_",study[1],".xlsx")
 
+
+nrtestdata<-4
+nadata<-40
+TV <-10
+N<-c(100)
+P<-c(100)
+excelpath<-paste0("~/GitHub/mscproject/Data/RSF_",study[4],"TV",TV,".xlsx")
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
 saveWorkbook(wb,excelpath, overwrite = FALSE)
 
-nrdata<-1
-nrtestdata<-2
-TV <-10
-N_arr<-c(100)
-P<-c(100)
+for (nrdata in c(1:3)){
 
-for (k in c(1:length(N_arr))){N<<-N_arr[k]
-
-datasrc <-paste0("~/GitHub/mscproject/Data/",study[1],"/N",N,"_P20-100_TV10(",nrdata,")")
-datasrc2 <-paste0("~/GitHub/mscproject/Data/",study[1],"/N",N,"_P20-100_TV10(",nrtestdata,")")
+datasrc <-paste0("~/GitHub/mscproject/Data/",study[4],"/NA40/N100_P100_TV",TV,"(",nrdata,")")
+datasrc2 <-paste0("~/GitHub/mscproject/Data/",study[4],"/NA40/N100_P100_TV",TV,"(",nrtestdata,")")
 
 #Function for repeating RF with different datasets on a loop.
 rfsrc_in_loop <- function(p_number){
@@ -35,7 +35,7 @@ rfsrc_in_loop <- function(p_number){
   Variable_selection <<-c(1:3)
   cindex <<-c(1:3) 
 
-  savepath<<-paste0("",datasrc,"/RSF",p_number,"")
+  savepath<<-paste0("",datasrc,"/RSF100")
   for (j in c(1:3)){
 # Data cleaning (read .dat file and remove index column)
   set.seed(j)
@@ -149,30 +149,6 @@ rfsrc_in_loop <- function(p_number){
   capture.output(print(vimp), file=paste0(savepath,"/vimp(",j,").txt",""))
   ggsave(paste0("vimp(",j,").png"), plot=last_plot(),path=savepath)
 
-  #save survival prediction data
-  if(j==1){
-    wb2<-createWorkbook()
-    addWorksheet(wb2, "Train_Survival")
-    addWorksheet(wb2, "Train_Survival.oob")
-    addWorksheet(wb2, "Train_CV_Survival")
-    addWorksheet(wb2, "Test_Survival")
-    saveWorkbook(wb2,paste0("",savepath,"/RSF_resultsDB.xlsx",""), overwrite = TRUE)}
-  
-  survivalDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")"),seed=j,rfsrc_train$survival)
-  df4<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""),sheet="Train_Survival"), survivalDB)
-  survivaloobDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")",seed=j),rfsrc_train$survival.oob)
-  df5<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""),sheet = "Train_Survival.oob"), survivaloobDB)
-  CVsurvivalDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")",seed=j),rfsrc_train_CV$survival)
-  df6<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""), sheet="Train_CV_Survival"), CVsurvivalDB)
-  testsurvivalDB<<-cbind(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV10(",nrdata,")",seed=j), rfsrc_test$survival)
-  df7<<-rbind(read.xlsx(paste0("",savepath,"/RSF_resultsDB.xlsx",""), sheet="Test_Survival"), testsurvivalDB)
-  
-  writeData(wb2,sheet="Train_Survival",df4)
-  writeData(wb2,sheet="Train_Survival.oob",df5)
-  writeData(wb2,sheet="Train_CV_Survival",df6)
-  writeData(wb2,sheet="Test_Survival",df7)
-  saveWorkbook(wb2,paste0("",savepath,"/RSF_resultsDB.xlsx",""), overwrite = TRUE)
-  
 #Generalisation error
   gg_error1<-gg_error(rfsrc_train)
   plot(na.omit(gg_error1))  
@@ -254,16 +230,16 @@ rfsrc_in_loop <- function(p_number){
   Variable_selection[a]<<- precision_var
   cindex[a] <<- 1-rfsrc_test$err.rate[1000]
 
-  a <<- a+1
   p_number<<-p_number
+  a<<-a+1
   }
   #reset the "a" value to keep it =<3
   #collect average accuary values of the model at different P values
   #create dataframes and combine with old data
   
-  df1<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV",TV,"(",nrdata,")"), testdata=nrtestdata, p_n=P[i]/N_arr[k], test=mean(Err_test), train=mean(Err_train), 'precision.var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
+  df1<<-data.frame(dataset=paste0("P",P[i],"_N100_TV",TV,"(",nrdata,")"),'NA'=nadata, testdata=nrtestdata, p_n=P[i]/N, test=mean(Err_test), train=mean(Err_train), 'precision.var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
   df1<<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
-  df2<<-data.frame(dataset=paste0("P",P[i],"_N",N_arr[k],"_TV",TV,"(",nrdata,")"), testdata=nrtestdata,TV_P=TV/P[i], test=mean(Err_test), train=mean(Err_train),'precision.var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
+  df2<<-data.frame(dataset=paste0("P",P[i],"_N100_TV",TV,"(",nrdata,")"), 'NA'=nadata, testdata=nrtestdata,TV_P=TV/P[i], test=mean(Err_test), train=mean(Err_train),'precision.var'=mean(Variable_selection), 'C-Index'=mean(cindex), stringsAsFactors=FALSE)
   df2<<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
   
   #push combined data to a new excel file. 
@@ -277,6 +253,7 @@ rfsrc_in_loop <- function(p_number){
 }
 # Run rfsrc for different datasets on the loop 
 for (i in c(1:length(P))){rfsrc_in_loop(P[i])}
+
 }
 
 
@@ -335,6 +312,6 @@ ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
         axis.title.x = element_text(size=14, face="bold"),
         axis.title.y = element_text(size=14, face="bold"))+
   scale_x_continuous(trans = 'log2') +
-  ylim(NA,1)
+  ylim(0,1)
 ggsave(paste0("RSF select_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/EOT/")
 

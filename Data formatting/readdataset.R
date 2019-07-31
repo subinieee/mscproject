@@ -7,8 +7,8 @@ library(openxlsx)
 nrdata<-1
 nrtestdata<-1
 TV <-10
-N<-100#_arr<-c(10,50,100)
-p_number<-40#P<-c(20,40,60,80,100)
+N<-10#_arr<-c(10,50,100)
+p_number<-60#P<-c(20,40,60,80,100)
 
 
 datasrc <-paste0("~/GitHub/mscproject/Data//EOT/N",N,"_P20-100_TV10(",nrdata,")")
@@ -46,6 +46,5 @@ col_names <-paste0("","A",col_names[[1]],"")
 colnames(data_test) <-col_names
 colnames(data_test)[length(colnames(data_test))-1] <- "time"
 colnames(data_test)[length(colnames(data_test))] <- "event"
-
 
 

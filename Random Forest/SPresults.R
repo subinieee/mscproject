@@ -1,13 +1,15 @@
 library(readr)
 library(openxlsx)
-N_arr<-c(50,100)
+library(ggplot2)
+library(reshape2)
+N<-c(100)
 P_arr<-c(20,40,60,80,100) 
 TV<-10
-nrtestdata<-2
-nrdata<-1
+nrtestdata<-4
+nrdata<-3
 
 
-excelpath<-"~/GitHub/mscproject/Data/no EOT/SP_results_N10.xlsx"
+excelpath<-"~/GitHub/mscproject/Data/SP_1. DimensionN=100.xlsx"
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
@@ -64,12 +66,10 @@ calculateRiskScore <- function(riskSignatureDataframe, data){
 }
 
 
-for (k in c(1:2)){
-N<-N_arr[k]
 for (i in c(1:5)){P<-P_arr[i]
 #Load data
-learning_validation<-read.delim(paste0("~/GitHub/mscproject/Data/no EOT/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/OverfittingCurves_risk1_reg2_norm1_data2.txt"),header=FALSE,sep="")
-riskSignatureDataframe <- read.table(paste0("~/GitHub/mscproject/Data/no EOT/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/RiskScore_formula.txt"), sep = '*', col.names = c("Weight", "Covariate"), 
+learning_validation<-read.delim(paste0("~/GitHub/mscproject/Data/1. Dimension/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/OverfittingCurves_risk1_reg2_norm1_data2.txt"),header=FALSE,sep="")
+riskSignatureDataframe <- read.table(paste0("~/GitHub/mscproject/Data/1. Dimension/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/RiskScore_formula.txt"), sep = '*', col.names = c("Weight", "Covariate"), 
                                      stringsAsFactors = F, skip = 2, fill = T)
 
 data <-read.table(paste0("~/GitHub/mscproject/Data/no EOT/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SD",P,".dat"), sep = '', skip=3,
@@ -127,9 +127,6 @@ saveWorkbook(wb,excelpath, overwrite = TRUE)
 
 }
 
-
-
-}
 
 #linear plot
 

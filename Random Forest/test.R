@@ -6,21 +6,22 @@ library(parallel)
 library(caret)
 library(readr)
 library(openxlsx)
-
-
-
+/Users/subinieee/GitHub/mscproject/Data/1. Dimension/N50_P20-100_TV10(1)/sd20/SD20.dat
+study<- c('1. Dimension','2. Noise','3. Censoring','4. Missing data','5. Negative Control')
 nrdata<-1
-nrtestdata<-1
+nrtestdata<-2
 TV <-10
-N<-50#_arr<-c(10,50,100)
-p_number<-60#P<-c(20,40,60,80,100)
-
-datasrc <-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")")
+N_arr<-c(50,100)
+p_number<-c(20,40,60,80,100)
+N<-N_arr[1]
+P<-p_number[3]
+datasrc <-paste0("~/GitHub/mscproject/Data/",study[1],"/N",N,"_P20-100_TV10(",nrdata,")")
+datasrc2 <-paste0("~/GitHub/mscproject/Data/",study[1],"/N",N,"_P20-100_TV10(",nrtestdata,")")
 #Function for repeating RF with different datasets on a loop.
 
     # Data cleaning (read .dat file and remove index column)
     set.seed(1)
-    data_train <-read.delim(paste0("",datasrc,"/sd",p_number,"/SD",p_number,".dat"), 
+    data_train <-read.delim(paste0("",datasrc,"/sd",P,"/SD",P,".dat"), 
                             skip=3, 
                             sep=(" "),
                             nrows=N, 
@@ -28,10 +29,10 @@ datasrc <-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")")
                             stringsAsFactors = FALSE)
     data_train <- data_train[,-1]
   
-    data_test <-read.delim(paste0("~/GitHub/mscproject/Data/Test(",nrtestdata,")/sd",p_number,"_test/SD",p_number,".dat"),
+    data_test <-read.delim(paste0("",datasrc,"/sd",P,"/SD",P,".dat"),
                            skip=3, 
                            sep=(" "),
-                           nrows=100, 
+                           nrows=N, 
                            header = FALSE, 
                            stringsAsFactors = FALSE)
     data_test <- data_test[,-1]
@@ -48,7 +49,7 @@ datasrc <-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")")
 
     
     
-    data_train$event[censored_before] <-"1"
+    #data_train$event[censored_before] <-"1"
     data_train$event <-as.numeric(data_train$event)
     col_names <-list(1:ncol(data_test))
     col_names <-paste0("","A",col_names[[1]],"")
@@ -85,7 +86,7 @@ datasrc <-paste0("~/GitHub/mscproject/Data/N",N,"_P20-100_TV10(",nrdata,")")
     
     #train set train (default nodesize is 15 for survival family - the paper used 3)
     rfsrc_train <- rfsrc(Surv(time,event) ~ .,
-                         ntree = 500,
+                         ntree = 1000,
                          nodesize = 3,
                          data=data_train,
                          nsplit=10, 
