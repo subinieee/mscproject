@@ -1,4 +1,18 @@
-Wed Jul 24 18:13:01 2019
+Sun Jul 28 20:52:07 2019
 reading SD80.dat
 normalizing data ...
-returning allocated memory ...
+batch multivariate regression ...
+prediction performance quantified by counting errors
+cutoff time: 2.941637
+regulariser: L=2
+preselection of covariates: rank correlation with outcome
+covariate selection: error expectation minimisation
+50/50 cross-validation
+nr of training sets per iteration: 200
+HYPERPARAMETER_CONTROL=3
+duration of batch loop: 0.011331 days
+proposed nr of covariates, test data performance: 14
+proposed nr of covariates, avoiding overfitting:  9
+calculating error bars ...
+reading SD80.dat
+normalizing data ...
