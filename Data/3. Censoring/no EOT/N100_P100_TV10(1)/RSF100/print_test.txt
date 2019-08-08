@@ -7,5 +7,5 @@
     Resample size used to grow trees: 63
                             Analysis: RSF
                               Family: surv
-                 Test set error rate: 33.05%
+                 Test set error rate: 36.42%
 

@@ -2,7 +2,7 @@
                     Number of deaths: 100
                      Number of trees: 1000
            Forest terminal node size: 3
-       Average no. of terminal nodes: 24.866
+       Average no. of terminal nodes: 24.978
 No. of variables tried at each split: 5
               Total no. of variables: 20
        Resampling used to grow trees: swor
@@ -11,5 +11,5 @@ No. of variables tried at each split: 5
                               Family: surv
                       Splitting rule: logrank *random*
        Number of random split points: 10
-                          Error rate: 27.82%
+                          Error rate: 28.22%
 

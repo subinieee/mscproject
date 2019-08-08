@@ -2,14 +2,14 @@ library(readr)
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-N<-c(100)
+N<-c(50)
 P_arr<-c(20,40,60,80,100) 
 TV<-10
 nrtestdata<-4
-nrdata<-3
+nrdata_arr<-c(1:3)
+P<-20
 
-
-excelpath<-"~/GitHub/mscproject/Data/SP_1. DimensionN=100.xlsx"
+excelpath<-"~/GitHub/mscproject/Data/SP_1. Dimension_N=50.xlsx"
 wb<-createWorkbook()
 addWorksheet(wb, "P_N")
 addWorksheet(wb, "TV_P")
@@ -66,15 +66,17 @@ calculateRiskScore <- function(riskSignatureDataframe, data){
 }
 
 
-for (i in c(1:5)){P<-P_arr[i]
+for (i in c(1:3)){nrdata<-nrdata_arr[i]
+for (k in c(1:length(P_arr))){P<-P_arr[k]
 #Load data
-learning_validation<-read.delim(paste0("~/GitHub/mscproject/Data/1. Dimension/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/OverfittingCurves_risk1_reg2_norm1_data2.txt"),header=FALSE,sep="")
-riskSignatureDataframe <- read.table(paste0("~/GitHub/mscproject/Data/1. Dimension/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/RiskScore_formula.txt"), sep = '*', col.names = c("Weight", "Covariate"), 
+datasrc_test<-paste0("~/GitHub/mscproject/Data/1. Dimension/N50_P20-100_TV10(",nrdata,")/test/sd",P,"/confusion_table.txt")
+riskSignatureDataframe <- read.table(paste0("~/GitHub/mscproject/Data/1. Dimension/N50_P20-100_TV10(",nrdata,")/sd",P,"/RiskScore_formula.txt"), sep = '*', col.names = c("Weight", "Covariate"), 
                                      stringsAsFactors = F, skip = 2, fill = T)
 
-data <-read.table(paste0("~/GitHub/mscproject/Data/no EOT/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SD",P,".dat"), sep = '', skip=3,
+data <-read.table(paste0("~/GitHub/mscproject/Data/1. Dimension/N50_P20-100_TV10(",nrtestdata,")/sd",P,"/SD",P,".dat"), sep = '', skip=3,
                   stringsAsFactors = F, fill = T, nrows=N)
-act_CoV<-read.csv(paste0("~/GitHub/mscproject/Data/no EOT/N",N,"_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/active_covariates.txt"),sep = "",header = FALSE)
+act_CoV<-read.csv(paste0("~/GitHub/mscproject/Data/1. Dimension/N50_P20-100_TV10(",nrdata,")/sd",P,"/SETCV_L2/active_covariates.txt"),sep = "",header = FALSE)
+
 
 #data formatting
 data<-data[,-1]
@@ -107,15 +109,19 @@ paste("C-Index score:",cindex)
 
 #variable selection
 act_CoV<-paste(act_CoV[(nrow(act_CoV)-(TV-1)),(2:(TV+1))])
-CoV_count<-length(which(as.numeric(act_CoV[1:TV])<=10))
-precision_var<-length(which(as.numeric(act_CoV[1:TV])<=10))/TV
-prediction_accuracy <-learning_validation[length(riskSignatureDataframe$Covariate)-1,2]
+CoV_count<-length(which(as.numeric(act_CoV[1:TV])<=TV))
+sensitivity_rate<-length(which(as.numeric(act_CoV[1:TV])<=TV))/TV
+specificity_rate<-length(which(act_CoV>TV))/(P-TV)
 
+conf_test <-read.table(text = gsub("/", "\t", read_lines(datasrc_test)), sep=(""), header = FALSE, nrows = 2)
+c<-conf_test$V7[1]+conf_test$V11[2]
+d<-conf_test$V8[1]+conf_test$V12[2]
+accuracy_test <-c/d
 
 #create dataframes and combine with old data
-df1<<-data.frame(dataset=paste0("P",P,"_N",N,"_TV10(",nrdata,")"),'p_n'=P/N, 'prediction accuracy'=prediction_accuracy, 'var_sensitivity'=precision_var, 'C-Index'=cindex, stringsAsFactors=FALSE)
+df1<<-data.frame("P"=P,"N"=N,"TV"=TV, 'nrdata'=nrdata,'p_n'=P/N, 'prediction accuracy'=accuracy_test, 'Sensitivity'=sensitivity_rate, 'Specificity'=specificity_rate,'C-Index'=cindex, stringsAsFactors=FALSE)
 df1<<-rbind(read.xlsx(excelpath,sheet="P_N"), df1)
-df2<<-data.frame(dataset=paste0("P",P,"_N",N,"_TV10(",nrdata,")"),'TV_P'=TV/P, 'prediction accuracy'=prediction_accuracy, 'var_sensitivity'=precision_var, 'C-Index'=cindex, stringsAsFactors=FALSE)
+df2<<-data.frame("P"=P,"N"=N,"TV"=TV, 'nrdata'=nrdata,'TV_P'=TV/P, 'prediction accuracy'=accuracy_test, 'Sensitivity'=sensitivity_rate, 'Specificity'=specificity_rate, 'C-Index'=cindex, stringsAsFactors=FALSE)
 df2<<-rbind(read.xlsx(excelpath,sheet = "TV_P"), df2)
 #push combined data to a new excel file. 
 wb<-createWorkbook()
@@ -124,7 +130,7 @@ writeData(wb,sheet="P_N",df1)
 addWorksheet(wb, "TV_P")
 writeData(wb,sheet="TV_P",df2)
 saveWorkbook(wb,excelpath, overwrite = TRUE)
-
+}
 }
 
 
@@ -136,7 +142,7 @@ cbPalette <- c("#006633", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
 Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('prediction.accuracy','C.Index'))
 ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
   geom_point(aes(shape=variable),size = 3) +
-  labs(y = "Prediction Accuracy", x = "Features/Data")+
+  labs(y = "Value", x = "Feature Dimension")+
   geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
   theme(plot.title = element_text(size=14, face="bold.italic"),
         axis.title.x = element_text(size=14, face="bold"),
@@ -145,24 +151,23 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
   ylim(NA,1)
 ggsave(paste0("SP predacc_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
-Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('prediction accuracy','C-index'))
+Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('prediction.accuracy','C.Index'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
   geom_point(aes(shape=variable),size = 3) +
-  labs(y = "Prediction Accuracy", x = "True Covariates/Features")+
+  labs(y = "Value", x = "Fraction of True Features")+
   geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
   theme(plot.title = element_text(size=14, face="bold.italic"),
         axis.title.x = element_text(size=14, face="bold"),
         axis.title.y = element_text(size=14, face="bold"))+
-  scale_x_continuous(trans = 'log2') +
-  ylim(NA,1)
+  ylim(0,1)
 ggsave(paste0("SP predacc_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
-Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('var_sensitivity'))
+Vis_df1 <- melt(df1, id.vars = c('p_n'), measure.vars = c('Sensitivity','Specificity'))
 ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) + 
   geom_point(aes(shape=variable),size = 3) +
   scale_colour_manual(values=cbPalette)+
   scale_fill_manual(values=cbPalette)+
-  labs(y = "Precision", x = "Features/Data")+
+  labs(y = "Value", x = "Feature Dimension")+
   geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
   theme(plot.title = element_text(size=14, face="bold.italic"),
         axis.title.x = element_text(size=14, face="bold"),
@@ -171,17 +176,16 @@ ggplot(Vis_df1, aes(x = p_n, y = value, color = variable) ) +
   ylim(NA,1)
 ggsave(paste0("SP select_p_n.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
-Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('var_sensitivity'))
+Vis_df2 <- melt(df2, id.vars = c('TV_P'), measure.vars = c('Sensitivity','Specificity'))
 ggplot(Vis_df2, aes(x = TV_P, y = value, color = variable) ) +
   geom_point(aes(shape=variable),size = 3) +
   scale_colour_manual(values=cbPalette)+
   scale_fill_manual(values=cbPalette)+
-  labs(y = "Precision", x = "True Covariates/Features")+
+  labs(y = "Value", x = "Fraction of True Features")+
   geom_smooth(method = "lm", alpha = .15, aes(fill = variable),size = 0.8)+ theme_bw()+
   theme(plot.title = element_text(size=14, face="bold.italic"),
         axis.title.x = element_text(size=14, face="bold"),
         axis.title.y = element_text(size=14, face="bold"))+
-  scale_x_continuous(trans = 'log2') +
-  ylim(NA,1)
+  ylim(0,1)
 ggsave(paste0("SP select_TV_P.png"), plot=last_plot(),path="~/GitHub/mscproject/Data/")
 
