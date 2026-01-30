@@ -1,4 +1,4 @@
-# MScproject - Machine Learning Methods for Cancer Survival Prediction
+# MSc project - Machine Learning Methods for Cancer Survival Prediction
 
 Version control for R scripts used for machine learning MSc project 
 
