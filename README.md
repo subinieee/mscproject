@@ -1,5 +1,6 @@
-# mscproject
-version control for R scripts used for machine learning MSc project 
+# MScproject - Machine Learning Methods for Cancer Survival Prediction
+
+Version control for R scripts used for machine learning MSc project 
 
 Autoit for Saddlepoint - automation scripts for a microsoft windows software, Saddle Point Signature.
 
