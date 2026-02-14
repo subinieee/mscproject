@@ -1,4 +1,4 @@
-# MSc Project --- Machine Learning Methods for Cancer Survival Prediction
+# MSc Project: Machine Learning Methods for Cancer Survival Prediction
 
 ## Status: Archive
 
@@ -30,8 +30,8 @@ biological relationships.
 This dissertation evaluated three complementary modelling approaches:
 
 -   Bayesian Multivariate Regression (BMR) using the Saddlepoint
-    Signature method\
--   Cox proportional hazards regression\
+    Signature method
+-   Cox proportional hazards regression
 -   Random Survival Forest (RSF)
 
 The goal was to assess their ability to model survival outcomes and
@@ -43,7 +43,7 @@ identify meaningful predictors from genomic and clinical data.
 
     mscproject/
     │
-    ├── Data/                     # Synthetic survival datasets
+    ├── Data/                    # Synthetic survival datasets
     ├── Data formatting/         # Data preprocessing and preparation scripts
     ├── Survival curves/         # Cox regression and Kaplan–Meier survival analysis
     ├── Random Forest/           # Random Survival Forest modelling scripts
@@ -56,20 +56,22 @@ identify meaningful predictors from genomic and clinical data.
 
 ### Bayesian Multivariate Regression (BMR) using Saddlepoint Signature
 
-Bayesian Multivariate Regression was used to model mutation signature
-contributions and multivariate genomic relationships.
+Bayesian Multivariate Regression is a regularised extension of multivariate Cox regression used to model survival outcomes and identify predictive features.
 
-Key features:
+The method combines:
 
--   Probabilistic estimation of regression parameters
--   Models multiple genomic variables simultaneously
--   Accounts for uncertainty in mutation signature estimation
--   Provides interpretable estimates of mutational processes
+- Cox multivariate regression as the underlying survival model
+- Ridge (L2) regularisation to reduce overfitting
+- Bayesian inference to estimate regression coefficients probabilistically
+- Recursive Backward Elimination (RBE) for iterative feature selection
 
-The Saddlepoint Signature method was used to efficiently perform
-Bayesian inference.\
-AutoIt scripts in this repository were used to automate execution of
-Saddlepoint Signature.
+This approach improves prediction accuracy and model stability, particularly in high-dimensional datasets.
+
+The final model produces regression coefficients and a multivariate risk score that combines multiple predictors into a single survival prediction measure.
+
+Saddlepoint Signature software was used to perform Bayesian Multivariate Regression (BMR) and to generate synthetic survival datasets with controlled variations in dimensionality, noise, censoring, and negative control variables. These datasets were used to evaluate model robustness and predictive performance under realistic data constraints.
+
+AutoIt scripts in this repository were used to automate execution of Saddlepoint Signature.
 
 Relevant directory:
 
@@ -114,52 +116,61 @@ Relevant directory:
 
 ## Synthetic datasets
 
-The `Data/` directory contains synthetic survival datasets generated to
-evaluate modelling approaches under controlled conditions. These
-datasets were designed to reflect key statistical challenges encountered
-in cancer survival and genomic data analysis.
+The `Data/` directory contains synthetic survival datasets generated using the Saddlepoint Signature software to evaluate modelling approaches under controlled statistical conditions.
 
-The datasets vary across several important factors:
+These datasets were designed to simulate key challenges encountered in cancer survival and genomic data analysis.
+
+The simulation scenarios were defined using the following constraint parameters:
+
+- **Number of features (P):** total number of predictor variables, including both true predictive features and noise features  
+- **Number of true features (X):** number of predictor variables that have a true association with survival outcome  
+- **Missing rate (NA%):** proportion of missing values in the dataset  
+- **End-of-trial censoring rate (EOT%):** proportion of samples whose survival time is censored at the end of the study period  
+
+These parameters allowed systematic evaluation of model performance under varying levels of complexity and data constraints.
+
+---
 
 ### Dimensionality
 
-Dimensionality refers to the number of predictor variables relative to
-the number of samples.
+Dimensionality refers to the number of predictor variables (P) relative to the number of samples.
 
-Cancer genomic datasets often contain many predictors, which can make
-modelling difficult. These synthetic datasets allow evaluation of model
-performance under different dimensional settings.
+High-dimensional datasets, where the number of features is large, are common in genomic studies and increase the risk of overfitting. These synthetic datasets include different dimensional settings to evaluate how modelling methods perform under varying feature-space complexity.
 
-------------------------------------------------------------------------
+---
 
-### Noise
+### Noise and true features
 
-Noise refers to variability in predictor variables that does not contain
-meaningful information about survival outcomes.
+The datasets include both:
 
-Noise simulates biological variability and irrelevant features commonly
-present in real datasets. This allows evaluation of model robustness.
+- **True features (X):** predictors with a real association with survival outcome  
+- **Noise features:** predictors with no true association with survival outcome  
 
-------------------------------------------------------------------------
+Noise features simulate irrelevant variables commonly present in real-world datasets. This allows evaluation of the model’s ability to distinguish meaningful predictors from irrelevant ones and assess robustness to overfitting.
+
+---
+
+### Missing data
+
+Missing data were introduced at controlled rates (NA%) to simulate incomplete observations, which are common in clinical and genomic datasets.
+
+This allows evaluation of how modelling methods handle missing information and whether missingness affects predictive performance.
+
+---
 
 ### Censoring
 
-Censoring occurs when the exact survival time is not observed for all
-individuals, such as when a patient is still alive at the end of the
-study period.
+End-of-trial censoring (EOT%) was introduced to simulate realistic survival analysis conditions.
 
-Censoring is a fundamental characteristic of survival data, and these
-synthetic datasets simulate realistic censoring scenarios.
+Censoring occurs when the exact survival time is not observed, for example when a patient is still alive at the end of the study period.
 
-------------------------------------------------------------------------
+This ensures the synthetic datasets reflect the fundamental statistical properties of survival data.
 
-### Negative control variables
+---
 
-Negative control variables are predictors intentionally generated to
-have no true relationship with survival outcome.
+### Purpose of synthetic datasets
 
-These variables allow evaluation of whether models can correctly
-distinguish between informative and irrelevant predictors.
+These synthetic datasets provide a controlled framework for evaluating the performance, stability, and feature selection behaviour of Bayesian Multivariate Regression, Cox proportional hazards regression, and Random Survival Forest methods under varying statistical constraints.
 
 ------------------------------------------------------------------------
 
